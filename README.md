@@ -1,4 +1,8 @@
 # Asesorias UABC
 Sistema de registro de asesorias
-# Activar entorno virtual
-```source venv/bin/activate```
+# Crear y activar entorno virtual (macOS)
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
