@@ -1,0 +1,3 @@
+customtkinter # Mas widgets para TK https://customtkinter.tomschimansky.com/documentation/
+CTkMessagebox # Caja con mensaje https://github.com/Akascape/CTkMessagebox
+tkcalendar # Calendario de TKinter https://github.com/j4321/tkcalendar
