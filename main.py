@@ -7,7 +7,7 @@ from datetime import datetime
 import sqlite3
 import tkinter as tk
 
-ctk.set_appearance_mode("system")
+ctk.set_appearance_mode("dark")
 
 class mainApp(ctk.CTk):
     # Inicializacion
@@ -184,7 +184,6 @@ class mainApp(ctk.CTk):
                                            command=self.goBack)
         self.RegisterButton.pack(side="left", padx=10, pady=5)
         self.goBackButton.pack(side="left", padx=10, pady=5)
-
     # Función del botón para registrar
     def registerUser(self, id, password, typeuser, name, lastname, email):
         print("Se presionó el botón de registrar usuario")
@@ -225,7 +224,7 @@ class mainApp(ctk.CTk):
                 print("Usuario o contraseña incorrectos.")
                 messagebox.showinfo(title="Asesorias UABC", message="Usuario o contraseña incorrectos")
                 return False
-    # Función del botón para volver a la pantalla anterior
+    # Función del botón para volver a la pantalla anterior (del registro al login)
     def goBack(self):
         print("Botón de volver presionado")
         self.signUpFrame.grid_forget()
@@ -373,10 +372,16 @@ class mainApp(ctk.CTk):
         #
         self.viewAppointmentsFrame = ctk.CTkFrame(self)
         self.viewAppointmentsFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
-        if typeuser == "Alumno":
-            appointmentList = loadPendientAppointments(id)
+        self.viewAppointmentsLabel = ctk.CTkLabel(self.viewAppointmentsFrame,
+                                                  text=f"Citas registradas de {id}",
+                                                  font=("Arial",20,"bold"))
+        self.viewAppointmentsLabel.pack(pady=20)
+
+        if typeuser == "Alumno": # Pantalla para los alumnos
+            print("Se desplego la pantalla para alumnos")
+            appointmentList = loadPendientAppointmentsForStudent(id)
             if appointmentList == []:
-                appointmentList = ["No hay profesores registrados"]
+                appointmentList = ["No hay asesorias registrados"]
                 appointmentListBool = False
             else:
                 appointmentListBool = True
@@ -386,16 +391,59 @@ class mainApp(ctk.CTk):
                                                                     values=appointmentList,
                                                                     width=500)
             self.viewAppointmentsPendientCombobox.pack(pady=20)
-
+            
             if appointmentListBool:
                 self.deleteAppointmentButton = ctk.CTkButton(self.viewAppointmentsFrame,
-                                                         text="Eliminar cita",
-                                                         font=("Arial", 12, "bold"),
-                                                         fg_color=pbRed1,
-                                                         hover_color=pbRed2,
-                                                         command=lambda: deleteAppointment(self.viewAppointmentsPendientCombobox.get()))
-                self.deleteAppointmentButton.pack(pady=20)
-            
+                                                             text="Eliminar cita",
+                                                             font=("Arial", 12, "bold"),
+                                                             fg_color=pbRed1,
+                                                             hover_color=pbRed2,
+                                                             command=lambda: (deleteAppointment(self.viewAppointmentsPendientCombobox.get()),
+                                                                            self.viewAppointmentsFrame.grid_forget(),
+                                                                            self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                                            self.update_idletasks()))
+                self.deleteAppointmentButton.pack(pady=20) 
+            self.wdwGoToIndexFromAppointments = ctk.CTkButton(self.viewAppointmentsFrame,
+                                                              text='Volver',
+                                                              font=("Arial",12,"bold"),
+                                                              command= lambda: (self.viewAppointmentsFrame.grid_forget(),
+                                                                                self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                                                self.update_idletasks()))    
+            self.wdwGoToIndexFromAppointments.pack(pady=20)  
+        
+        if typeuser == "Maestro": # Pantalla para los maestros
+            print("Se desplego la pantalla para maestros")
+            appointmentList = loadPendientAppointmentsForTeachers(id)
+            if appointmentList == []:
+                appointmentList = ["No hay asesorias registrados"]
+                appointmentListBool = False
+            else:
+                appointmentListBool = True
+
+            self.viewAppointmentsPendientCombobox = ctk.CTkComboBox(self.viewAppointmentsFrame,
+                                                                    state="readonly",
+                                                                    values=appointmentList,
+                                                                    width=500)
+            self.viewAppointmentsPendientCombobox.pack(pady=20)
+            if appointmentListBool:
+                self.deleteAppointmentButton = ctk.CTkButton(self.viewAppointmentsFrame,
+                                                             text="Eliminar cita",
+                                                             font=("Arial", 12, "bold"),
+                                                             fg_color=pbRed1,
+                                                             hover_color=pbRed2,
+                                                             command=lambda: (deleteAppointment(self.viewAppointmentsPendientCombobox.get()),
+                                                                            self.viewAppointmentsFrame.grid_forget(),
+                                                                            self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                                            self.update_idletasks()))
+                self.deleteAppointmentButton.pack(pady=20) 
+            self.wdwGoToIndexFromAppointments = ctk.CTkButton(self.viewAppointmentsFrame,
+                                                              text='Volver',
+                                                              font=("Arial",12,"bold"),
+                                                              command= lambda: (self.viewAppointmentsFrame.grid_forget(),
+                                                                                self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                                                self.update_idletasks()))    
+            self.wdwGoToIndexFromAppointments.pack(pady=20)  
+
 
 def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
     print("Se presiono el boton de guardar cita")
@@ -438,23 +486,41 @@ def teacherList():
         print(f"Error al recuperar los profesores de la base de datos: {e}")
         return []
 
-def loadPendientAppointments(id):
+def loadPendientAppointmentsForStudent(id):
     with sqlite3.connect("database.db") as uabcDatabase:
         cursor = uabcDatabase.cursor()
-        cursor.execute("SELECT idTeacher, date, scheduleID FROM scheduleList WHERE idAlumn = ? AND state = 'Pendiente'", (id,))
+        cursor.execute("SELECT state, idTeacher, date, scheduleID FROM scheduleList WHERE idAlumn = ? AND state = 'Pendiente'", (id,))
         loadQuery = cursor.fetchall()
-        formatted_appointments = [f"Matricula del profesor: {teacher}, Fecha: {date}, scheduleID: {scheduleID}" for teacher, date, scheduleID in loadQuery]
+        formatted_appointments = [f"Estado: {state}, Matricula del profesor: {teacher}, Fecha: {date}, scheduleID: {scheduleID}" for state, teacher, date, scheduleID in loadQuery]
+        print(f"Lista de asesorias recuperadas:")
+        for i in formatted_appointments:
+            print(f'{i}')
+        return formatted_appointments
+
+def loadPendientAppointmentsForTeachers(id):
+    with sqlite3.connect("database.db") as uabcDatabase:
+        cursor = uabcDatabase.cursor()
+        cursor.execute("SELECT state, idTeacher, date, scheduleID FROM scheduleList WHERE idTeacher = ? AND state = 'Pendiente'", (id,))
+        loadQuery = cursor.fetchall()
+        formatted_appointments = [f"Estado: {state}, Matricula del profesor: {teacher}, Fecha: {date}, scheduleID: {scheduleID}" for state, teacher, date, scheduleID in loadQuery]
         print(f"Lista de asesorias recuperadas:")
         for i in formatted_appointments:
             print(f'{i}')
         return formatted_appointments
 
 def deleteAppointment(varToExtractScheduleID):
-    # Nota: En este punto el scheduleID aun no esta formateado
     scheduleID = extractScheduleId(varToExtractScheduleID)
     print(f"Se presiono el boton para eliminar la cita con ID: {scheduleID}")
-
-    
+    try:
+        with sqlite3.connect("database.db") as uabcDatabase:
+            cursor = uabcDatabase.cursor()
+            cursor.execute("DELETE FROM scheduleList WHERE scheduleId = ?", (scheduleID,))
+            print("Asesoria eliminada con exito")
+            messagebox.showinfo(title="Asesorias UABC", message=f"Has eliminado con exito la asesoria con ID {scheduleID}")
+    except sqlite3.Error as e:
+        messagebox.showinfo(title="Asesorias UABC", message=f"Ha ocurrido un error {scheduleID}")
+        print("Error")
+   
 def extractScheduleId(cadena):
     # Dividimos la cadena por comas y espacios
     partes = cadena.split(', ')
@@ -467,6 +533,9 @@ def extractScheduleId(cadena):
     
     # Si no encontramos el scheduleID, retornamos None
     return None
+
+def acceptAppointment(varToExtractScheduleID):
+    print("El maestro presiono el boton para aceptar la cita")
 
 app = mainApp()
 app.mainloop()
