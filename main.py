@@ -337,7 +337,7 @@ class mainApp(ctk.CTk):
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbGreen1,
                                                             hover_color=pbGreen2,
-                                                            command=lambda: saveSchedule(id))
+                                                            command=lambda: saveSchedule(id, self.selectTeacherCombobox.get()))
         self.returnToIndexWindowAlumnButton.pack(pady=50, padx=(50,10), side='left',anchor="nw", expand=True)
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
@@ -350,13 +350,15 @@ class mainApp(ctk.CTk):
         # Forzar la actualización de la interfaz
         self.update_idletasks()
 
-    def update_selected_day(self, event):
+    def update_selected_day(self):
         selected_date = self.calendar.get_date()
         self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
         print(f"Fecha seleccionada: {selected_date}")
 
-def saveSchedule(idAlumn, ):
+def saveSchedule(idAlumn, idTeacher):
     print("Se presiono el boton de guardar cita")
+    idTeacher = idTeacher.split(" - ")[-1]
+    print(f'Matricula del profesor escogido: {idTeacher}')
     try:
         with sqlite3.connect("database.db") as uabcDatabase:
             cursor = uabcDatabase.cursor()
@@ -367,8 +369,6 @@ def saveSchedule(idAlumn, ):
 
     except sqlite3.Error as e:
         print("Error")
-    
-    print(id)
 
 def teacherList():
     teachers = []
@@ -390,7 +390,6 @@ def teacherList():
     except sqlite3.Error as e:
         print(f"Error al recuperar los profesores de la base de datos: {e}")
         return []
-
 
 app = mainApp()
 app.mainloop()
