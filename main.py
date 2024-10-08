@@ -436,6 +436,16 @@ class mainApp(ctk.CTk):
                                                                             self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
                                                                             self.update_idletasks()))
                 self.deleteAppointmentButton.pack(pady=20) 
+                self.acceptAppointmentButton = ctk.CTkButton(self.viewAppointmentsFrame,
+                                                             text="Aceptar cita",
+                                                             font=("Arial", 12, "bold"),
+                                                             fg_color=pbGreen1,
+                                                             hover_color=pbGreen2,
+                                                             command=lambda: (acceptAppointment(self.viewAppointmentsPendientCombobox.get()),
+                                                                            self.viewAppointmentsFrame.grid_forget(),
+                                                                            self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                                            self.update_idletasks()))
+                self.acceptAppointmentButton.pack(pady=20) 
             self.wdwGoToIndexFromAppointments = ctk.CTkButton(self.viewAppointmentsFrame,
                                                               text='Volver',
                                                               font=("Arial",12,"bold"),
@@ -489,7 +499,7 @@ def teacherList():
 def loadPendientAppointmentsForStudent(id):
     with sqlite3.connect("database.db") as uabcDatabase:
         cursor = uabcDatabase.cursor()
-        cursor.execute("SELECT state, idTeacher, date, scheduleID FROM scheduleList WHERE idAlumn = ? AND state = 'Pendiente'", (id,))
+        cursor.execute("SELECT state, idTeacher, date, scheduleID FROM scheduleList WHERE idAlumn = ?", (id,))
         loadQuery = cursor.fetchall()
         formatted_appointments = [f"Estado: {state}, Matricula del profesor: {teacher}, Fecha: {date}, scheduleID: {scheduleID}" for state, teacher, date, scheduleID in loadQuery]
         print(f"Lista de asesorias recuperadas:")
@@ -500,7 +510,7 @@ def loadPendientAppointmentsForStudent(id):
 def loadPendientAppointmentsForTeachers(id):
     with sqlite3.connect("database.db") as uabcDatabase:
         cursor = uabcDatabase.cursor()
-        cursor.execute("SELECT state, idTeacher, date, scheduleID FROM scheduleList WHERE idTeacher = ? AND state = 'Pendiente'", (id,))
+        cursor.execute("SELECT state, idTeacher, date, scheduleID FROM scheduleList WHERE idTeacher = ?", (id,))
         loadQuery = cursor.fetchall()
         formatted_appointments = [f"Estado: {state}, Matricula del profesor: {teacher}, Fecha: {date}, scheduleID: {scheduleID}" for state, teacher, date, scheduleID in loadQuery]
         print(f"Lista de asesorias recuperadas:")
@@ -511,6 +521,9 @@ def loadPendientAppointmentsForTeachers(id):
 def deleteAppointment(varToExtractScheduleID):
     scheduleID = extractScheduleId(varToExtractScheduleID)
     print(f"Se presiono el boton para eliminar la cita con ID: {scheduleID}")
+    if scheduleID == None:
+        messagebox.showinfo(title="Asesorias UABC", message=f"No seleccionaste ningun elemento")
+        return
     try:
         with sqlite3.connect("database.db") as uabcDatabase:
             cursor = uabcDatabase.cursor()
@@ -518,7 +531,7 @@ def deleteAppointment(varToExtractScheduleID):
             print("Asesoria eliminada con exito")
             messagebox.showinfo(title="Asesorias UABC", message=f"Has eliminado con exito la asesoria con ID {scheduleID}")
     except sqlite3.Error as e:
-        messagebox.showinfo(title="Asesorias UABC", message=f"Ha ocurrido un error {scheduleID}")
+        messagebox.showinfo(title="Asesorias UABC", message=f"Ha ocurrido un error")
         print("Error")
    
 def extractScheduleId(cadena):
@@ -536,6 +549,16 @@ def extractScheduleId(cadena):
 
 def acceptAppointment(varToExtractScheduleID):
     print("El maestro presiono el boton para aceptar la cita")
-
+    scheduleID = extractScheduleId(varToExtractScheduleID)
+    try:
+        with sqlite3.connect("database.db") as uabcDatabase:
+            cursor = uabcDatabase.cursor()
+            cursor.execute("UPDATE scheduleList SET state = 'Aceptado' WHERE scheduleId = ?;", (scheduleID,))
+            print("Asesoria aceptada con exito")
+            messagebox.showinfo(title="Asesorias UABC", message=f"Se ha aceptado la asesoria {scheduleID}")
+    except sqlite3.Error as e:
+        messagebox.showinfo(title="Asesorias UABC", message=f"Ha ocurrido un error {scheduleID}")
+        print("Error")
+    
 app = mainApp()
 app.mainloop()
