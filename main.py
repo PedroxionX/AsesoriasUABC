@@ -184,6 +184,7 @@ class mainApp(ctk.CTk):
                                            command=self.goBack)
         self.RegisterButton.pack(side="left", padx=10, pady=5)
         self.goBackButton.pack(side="left", padx=10, pady=5)
+
     # Función del botón para registrar
     def registerUser(self, id, password, typeuser, name, lastname, email):
         print("Se presionó el botón de registrar usuario")
@@ -211,10 +212,10 @@ class mainApp(ctk.CTk):
         print("Se presionó el botón para hacer un inicio de sesión")
         with sqlite3.connect("database.db") as uabcDatabase:
             cursor = uabcDatabase.cursor()
-            cursor.execute("SELECT name, lastname FROM users WHERE id = ? AND password = ?", (id, password))
+            cursor.execute("SELECT name, lastname, typeuser FROM users WHERE id = ? AND password = ?", (id, password))
             usuario = cursor.fetchone()
             if usuario:
-                name, lastname = usuario
+                name, lastname, typeuser = usuario
                 print("Usuario encontrado. Acceso concedido.")
                 messagebox.showinfo(title="Asesorias UABC", message=f"Bienvenido {name} {lastname}")
                 self.loginFrame.grid_forget()  # Ocultar el frame de login
@@ -234,36 +235,44 @@ class mainApp(ctk.CTk):
     def indexWindowAlumn(self, id):
         print("Ventana de indice para el alumno")
         print(id)
+        with sqlite3.connect("database.db") as uabcDatabase:
+            cursor = uabcDatabase.cursor()
+            cursor.execute("SELECT typeuser FROM users WHERE id = ?", (id,))
+            typeuser = cursor.fetchone()[0] # El [0] es para que acceda solo a la tupla e imprima unicamente la palabra del tipo de usuario
+            print(typeuser)
         # Crear el nuevo frame de índice
         self.indexFrame = ctk.CTkFrame(self)
-        self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
+        self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew") 
         
-        # Botón para agendar cita dentro del indexFrame
         self.scheduleAppointmentButton = ctk.CTkLabel(self.indexFrame,
-                                                    text="Universidad Autonoma de Baja California - Sistema de asesorias",
-                                                    font=('Arial', 30, 'bold'),
-                                                    text_color='white',
-                                                    fg_color='transparent')
+                                                        text="Universidad Autonoma de Baja California - Sistema de asesorias",
+                                                        font=('Arial', 30, 'bold'),
+                                                        text_color='white',
+                                                        fg_color='transparent')
         self.scheduleAppointmentButton.pack(pady=100)
-        self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
-                                                    text="Agendar asesoria",
-                                                    font=('Arial', 15, 'bold'),
-                                                    fg_color=pbGreen1,
-                                                    hover_color=pbGreen2,
-                                                    command= lambda: self.scheduleAppointmentWindow(id))
-        self.scheduleAppointmentButton.pack(pady=(20, 10))
+         # Botón para agendar cita dentro del indexFrame
+        if typeuser == "Alumno":
+            self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
+                                                        text="Agendar asesoria",
+                                                        font=('Arial', 15, 'bold'),
+                                                        fg_color=pbGreen1,
+                                                        hover_color=pbGreen2,
+                                                        command= lambda: self.scheduleAppointmentWindow(id))
+            self.scheduleAppointmentButton.pack(pady=(20, 10))
+
         self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
                                                     text="Ver asesorias registradas",
                                                     font=('Arial', 15, 'bold'),
                                                     fg_color=pbGreen1,
-                                                    hover_color=pbGreen2)
+                                                    hover_color=pbGreen2,
+                                                    command=lambda: self.viewAppointments(id, typeuser))
         self.scheduleAppointmentButton.pack(pady=(20, 10))
     
         # Actualizar la ventana para que los cambios se reflejen
         self.update_idletasks()
     # Pagina para agendar cita
     def scheduleAppointmentWindow(self, id):
-        print("Se accedió a la ventana de agendar cita")
+        print("Se accedio a la ventana de agendar cita")
         
         # Ocultar el frame anterior
         if hasattr(self, 'indexFrame'):
@@ -358,12 +367,42 @@ class mainApp(ctk.CTk):
         self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
         print(f"Fecha seleccionada: {selected_date}")
 
+    def viewAppointments(self, id, typeuser):
+        print("Se presiono el boton de ver asesorias pendientes")
+        self.indexFrame.grid_forget()
+        #
+        self.viewAppointmentsFrame = ctk.CTkFrame(self)
+        self.viewAppointmentsFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
+        if typeuser == "Alumno":
+            appointmentList = loadPendientAppointments(id)
+            if appointmentList == []:
+                appointmentList = ["No hay profesores registrados"]
+                appointmentListBool = False
+            else:
+                appointmentListBool = True
+
+            self.viewAppointmentsPendientCombobox = ctk.CTkComboBox(self.viewAppointmentsFrame,
+                                                                    state="readonly",
+                                                                    values=appointmentList,
+                                                                    width=500)
+            self.viewAppointmentsPendientCombobox.pack(pady=20)
+
+            if appointmentListBool:
+                self.deleteAppointmentButton = ctk.CTkButton(self.viewAppointmentsFrame,
+                                                         text="Eliminar cita",
+                                                         font=("Arial", 12, "bold"),
+                                                         fg_color=pbRed1,
+                                                         hover_color=pbRed2,
+                                                         command=lambda: deleteAppointment(self.viewAppointmentsPendientCombobox.get()))
+                self.deleteAppointmentButton.pack(pady=20)
+            
+
 def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
     print("Se presiono el boton de guardar cita")
     idTeacher = idTeacher.split(" - ")[-1] # Convertir idTeacher a solo la matricula
     print(f'Matricula del profesor escogido: {idTeacher}')
     print(f'Dia escogido: {date}')
-    print(scheduleDescription)
+    print(f'Descripcion de la asesoria: {scheduleDescription}')
     state = "Pendiente"
     scheduleId = f"{idAlumn}{idTeacher}{date}"
     try:
@@ -398,6 +437,36 @@ def teacherList():
     except sqlite3.Error as e:
         print(f"Error al recuperar los profesores de la base de datos: {e}")
         return []
+
+def loadPendientAppointments(id):
+    with sqlite3.connect("database.db") as uabcDatabase:
+        cursor = uabcDatabase.cursor()
+        cursor.execute("SELECT idTeacher, date, scheduleID FROM scheduleList WHERE idAlumn = ? AND state = 'Pendiente'", (id,))
+        loadQuery = cursor.fetchall()
+        formatted_appointments = [f"Matricula del profesor: {teacher}, Fecha: {date}, scheduleID: {scheduleID}" for teacher, date, scheduleID in loadQuery]
+        print(f"Lista de asesorias recuperadas:")
+        for i in formatted_appointments:
+            print(f'{i}')
+        return formatted_appointments
+
+def deleteAppointment(varToExtractScheduleID):
+    # Nota: En este punto el scheduleID aun no esta formateado
+    scheduleID = extractScheduleId(varToExtractScheduleID)
+    print(f"Se presiono el boton para eliminar la cita con ID: {scheduleID}")
+
+    
+def extractScheduleId(cadena):
+    # Dividimos la cadena por comas y espacios
+    partes = cadena.split(', ')
+    
+    # Buscamos la parte que comienza con "scheduleID:"
+    for parte in partes:
+        if parte.startswith("scheduleID:"):
+            # Retornamos solo el valor del scheduleID
+            return parte.split(': ')[1]
+    
+    # Si no encontramos el scheduleID, retornamos None
+    return None
 
 app = mainApp()
 app.mainloop()
