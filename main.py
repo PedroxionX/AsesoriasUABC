@@ -337,7 +337,10 @@ class mainApp(ctk.CTk):
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbGreen1,
                                                             hover_color=pbGreen2,
-                                                            command=lambda: saveSchedule(id, self.selectTeacherCombobox.get()))
+                                                            command=lambda: saveSchedule(id, 
+                                                                                         self.selectTeacherCombobox.get(), 
+                                                                                         self.calendar.get_date(), 
+                                                                                         self.scheduleDescriptionTextbox.get("1.0", "end")))
         self.returnToIndexWindowAlumnButton.pack(pady=50, padx=(50,10), side='left',anchor="nw", expand=True)
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
@@ -350,25 +353,30 @@ class mainApp(ctk.CTk):
         # Forzar la actualización de la interfaz
         self.update_idletasks()
 
-    def update_selected_day(self):
+    def update_selected_day(self, event=None):
         selected_date = self.calendar.get_date()
         self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
         print(f"Fecha seleccionada: {selected_date}")
 
-def saveSchedule(idAlumn, idTeacher):
+def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
     print("Se presiono el boton de guardar cita")
-    idTeacher = idTeacher.split(" - ")[-1]
+    idTeacher = idTeacher.split(" - ")[-1] # Convertir idTeacher a solo la matricula
     print(f'Matricula del profesor escogido: {idTeacher}')
+    print(f'Dia escogido: {date}')
+    print(scheduleDescription)
+    state = "Pendiente"
+    scheduleId = f"{idAlumn}{idTeacher}{date}"
     try:
         with sqlite3.connect("database.db") as uabcDatabase:
+            # Nota: Poner logica aqui por si ya encuentra un id igual que no registre la cita
             cursor = uabcDatabase.cursor()
-            profId = cursor.execute("SELECT * FROM users WHERE id")
-            cursor.execute("INSERT INTO scheduleList (scheduleId, idAlumn, idTeacher, date) VALUES (?, ?, ?, ?)", ("", idAlumn, "", ""))
-            # 
-            cursor.execute("INSERT INTO scheduleList (scheduleId, idAlumn, idTeacher, date) VALUES (?, ?, ?, ?)", ("", idAlumn, "", ""))
-
+            cursor.execute("INSERT INTO scheduleList (scheduleId, idAlumn, idTeacher, date, scheduleDescription, state) VALUES (?, ?, ?, ?, ?, ?)", 
+                           (scheduleId, idAlumn, idTeacher, date, scheduleDescription, state))
+            print("Asesoria guardada con exito")
+            messagebox.showinfo(title="Asesorias UABC", message=f"Has registrado con exito la asesoria el dia {date}")
     except sqlite3.Error as e:
         print("Error")
+        messagebox.showinfo(title="Asesorias UABC", message="Ha ocurrido un error, por favor revisa la informacion ingresada")
 
 def teacherList():
     teachers = []
