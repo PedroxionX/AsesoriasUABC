@@ -9,7 +9,6 @@ import tkinter as tk
 
 ctk.set_appearance_mode("system")
 
-
 class mainApp(ctk.CTk):
     # Inicializacion
     def __init__(self):
@@ -74,7 +73,6 @@ class mainApp(ctk.CTk):
         
         self.loginFrame.grid_rowconfigure(0, weight=1)
         self.loginFrame.grid_columnconfigure(0, weight=1)
-
     # SignUp
     def signUp(self):
         print("Se presionó el botón de registrar usuario")
@@ -186,7 +184,6 @@ class mainApp(ctk.CTk):
                                            command=self.goBack)
         self.RegisterButton.pack(side="left", padx=10, pady=5)
         self.goBackButton.pack(side="left", padx=10, pady=5)
-
     # Función del botón para registrar
     def registerUser(self, id, password, typeuser, name, lastname, email):
         print("Se presionó el botón de registrar usuario")
@@ -209,7 +206,6 @@ class mainApp(ctk.CTk):
             else:
                 print("Ya existe un usuario con esa matrícula.")
                 messagebox.showinfo(title="Asesorias UABC", message="Ya existe un usuario con esa matrícula. Por favor ingresa otra.")
-
     # LogIn
     def logIn(self, id, password):
         print("Se presionó el botón para hacer un inicio de sesión")
@@ -228,14 +224,12 @@ class mainApp(ctk.CTk):
                 print("Usuario o contraseña incorrectos.")
                 messagebox.showinfo(title="Asesorias UABC", message="Usuario o contraseña incorrectos")
                 return False
-
     # Función del botón para volver a la pantalla anterior
     def goBack(self):
         print("Botón de volver presionado")
         self.signUpFrame.grid_forget()
         self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
         self.update_idletasks()
-
     # Pagina principal
     def indexWindowAlumn(self, id):
         print("Ventana de indice para el alumno")
@@ -256,7 +250,7 @@ class mainApp(ctk.CTk):
                                                     font=('Arial', 15, 'bold'),
                                                     fg_color=pbGreen1,
                                                     hover_color=pbGreen2,
-                                                    command= lambda: self.scheduleAppointmentWindow())
+                                                    command= lambda: self.scheduleAppointmentWindow(id))
         self.scheduleAppointmentButton.pack(pady=(20, 10))
         self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
                                                     text="Ver asesorias registradas",
@@ -267,8 +261,8 @@ class mainApp(ctk.CTk):
     
         # Actualizar la ventana para que los cambios se reflejen
         self.update_idletasks()
-
-    def scheduleAppointmentWindow(self):
+    # Pagina para agendar cita
+    def scheduleAppointmentWindow(self, id):
         print("Se accedió a la ventana de agendar cita")
         
         # Ocultar el frame anterior
@@ -310,7 +304,9 @@ class mainApp(ctk.CTk):
 
         # Recuperar la lista de profesores de la base de datos y en caso de que este vacia hacerselo saber al usuario
         teachersListVar = teacherList()
+
         if teachersListVar == []:
+            teachersRegistered = False
             teachersListVar = ["No hay profesores registrados"]
 
         # Crear y mostrar el label con la fecha seleccionada
@@ -335,13 +331,16 @@ class mainApp(ctk.CTk):
                                                             fg_color=pbRed1,
                                                             hover_color=pbRed2,
                                                             command= lambda: self.returnToIndexWindowAlumn())
-        self.saveScheduleAlumnButton = ctk.CTkButton(self.scheduleFrame,
+        if teachersListVar != ["No hay profesores registrados"]:
+            self.saveScheduleAlumnButton = ctk.CTkButton(self.scheduleFrame,
                                                             text="Agendar cita",
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbGreen1,
-                                                            hover_color=pbGreen2)
+                                                            hover_color=pbGreen2,
+                                                            command=lambda: saveSchedule(id))
         self.returnToIndexWindowAlumnButton.pack(pady=50, padx=(50,10), side='left',anchor="nw", expand=True)
-        self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
+        if teachersListVar != ["No hay profesores registrados"]:
+            self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
         
     def returnToIndexWindowAlumn(self):
         print("Se volvio al index")
@@ -356,28 +355,38 @@ class mainApp(ctk.CTk):
         self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
         print(f"Fecha seleccionada: {selected_date}")
 
+def saveSchedule(idAlumn, ):
+    print("Se presiono el boton de guardar cita")
+    try:
+        with sqlite3.connect("database.db") as uabcDatabase:
+            cursor = uabcDatabase.cursor()
+            profId = cursor.execute("SELECT * FROM users WHERE id")
+            cursor.execute("INSERT INTO scheduleList (scheduleId, idAlumn, idTeacher, date) VALUES (?, ?, ?, ?)", ("", idAlumn, "", ""))
+            # 
+            cursor.execute("INSERT INTO scheduleList (scheduleId, idAlumn, idTeacher, date) VALUES (?, ?, ?, ?)", ("", idAlumn, "", ""))
+
+    except sqlite3.Error as e:
+        print("Error")
+    
+    print(id)
+
 def teacherList():
     teachers = []
     try:
         with sqlite3.connect("database.db") as uabcDatabase:
             cursor = uabcDatabase.cursor()
-            
-           # Consulta SQL para seleccionar nombre y apellido de los maestros
-            query = "SELECT name, lastname FROM users WHERE typeuser = 'Maestro'"
-            
+            #Consulta SQL para seleccionar nombre y apellido de los maestros
+            query = "SELECT name, lastname, id FROM users WHERE typeuser = 'Maestro'"
             cursor.execute(query)
                 
             # Fetchall para obtener todos los resultados
             results = cursor.fetchall()
-                
             # Combinar nombre y apellido en una sola cadena
-            teachers = [f"{name} {lastname}" for name, lastname in results]
+            teachers = [f"{name} {lastname} - {id}" for name, lastname, id in results]
             
         print(f"Se recuperaron {len(teachers)} profesores de la base de datos")
-            
         # Devolver la lista de nombres de maestros
         return teachers
-        
     except sqlite3.Error as e:
         print(f"Error al recuperar los profesores de la base de datos: {e}")
         return []
