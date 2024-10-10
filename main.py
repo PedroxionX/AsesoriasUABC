@@ -191,9 +191,9 @@ class mainApp(ctk.CTk):
             cursor = uabcDatabase.cursor()
             cursor.execute("SELECT * FROM users WHERE id = ?", (id,))
             existing_user = cursor.fetchone()
-
             if existing_user is None:
                 print("No se encontró otro usuario con esa matrícula, se podrá agregar.")
+                
                 cursor.execute("INSERT INTO users (id, password, typeuser, name, lastname, email) VALUES (?, ?, ?, ?, ?, ?)", 
                                (id, password, typeuser, name, lastname, email))
 
@@ -206,6 +206,45 @@ class mainApp(ctk.CTk):
             else:
                 print("Ya existe un usuario con esa matrícula.")
                 messagebox.showinfo(title="Asesorias UABC", message="Ya existe un usuario con esa matrícula. Por favor ingresa otra.")
+    
+    
+    # NO TERMINADO
+    def selectSubjects(self):
+        self.indexFrame.grid_forget()
+        print("Se abrio el cuadro de seleccion de materias para el profesor")
+        self.subjectsFrame = ctk.CTkFrame(self)
+        self.subjectsFrame.grid(row=0, column=0, columnspan=2, rowspan=2, sticky="nsew")
+
+        self.label = ctk.CTkLabel(self.subjectsFrame,
+                                  text="Materias disponibles",
+                                  font=("Arial",20,"bold"))
+        self.label.pack(pady=50)
+        """
+        self.availableSubjectsListBox = ctk_listbox.CTkListbox(self.subjectsFrame)
+        self.availableSubjectsListBox.pack(fill="both", expand=True, padx=20, pady=(0,100), side='left')
+
+        cambiarmateria = lambda: print(self.availableSubjectsListBox.get())
+        self.botonrandom = ctk.CTkButton(self.subjectsFrame,
+                                         command= cambiarmateria)
+        self.botonrandom.pack(pady=20)
+
+        self.activatedSubjectsListBox = ctk_listbox.CTkListbox(self.subjectsFrame)
+        self.activatedSubjectsListBox.pack(fill="both", expand=True, padx=20, pady=(0,100), side='right')
+        
+        
+        self.availableSubjectsListBox.insert(0, "Option 0")
+        self.availableSubjectsListBox.insert(1, "Option 1")
+        self.availableSubjectsListBox.insert(2, "Option 2")
+
+        self.activatedSubjectsListBox.insert(0, "Option 0")
+        self.activatedSubjectsListBox.insert(1, "Option 1")
+        self.activatedSubjectsListBox.insert(2, "Option 2")
+        #
+        #Materias = ctk.CTkInputDialog(text="Type in a number:", title="Test")
+        """
+
+
+
     # LogIn
     def logIn(self, id, password):
         print("Se presionó el botón para hacer un inicio de sesión")
@@ -218,7 +257,7 @@ class mainApp(ctk.CTk):
                 print("Usuario encontrado. Acceso concedido.")
                 messagebox.showinfo(title="Asesorias UABC", message=f"Bienvenido {name} {lastname}")
                 self.loginFrame.grid_forget()  # Ocultar el frame de login
-                self.indexWindowAlumn(id)  # Llamar a la función para mostrar la ventana de índice
+                self.indexWindow(id)  # Llamar a la función para mostrar la ventana de índice
                 return True
             else:
                 print("Usuario o contraseña incorrectos.")
@@ -231,7 +270,7 @@ class mainApp(ctk.CTk):
         self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
         self.update_idletasks()
     # Pagina principal
-    def indexWindowAlumn(self, id):
+    def indexWindow(self, id):
         print("Ventana de indice para el alumno")
         print(id)
         with sqlite3.connect("database.db") as uabcDatabase:
@@ -251,12 +290,22 @@ class mainApp(ctk.CTk):
         self.scheduleAppointmentButton.pack(pady=100)
          # Botón para agendar cita dentro del indexFrame
         if typeuser == "Alumno":
+            print("Se mostro en pantalla el objeto boton para registrar asesoria para alumnos")
             self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
                                                         text="Agendar asesoria",
                                                         font=('Arial', 15, 'bold'),
                                                         fg_color=pbGreen1,
                                                         hover_color=pbGreen2,
                                                         command= lambda: self.scheduleAppointmentWindow(id))
+            self.scheduleAppointmentButton.pack(pady=(20, 10))
+        else:
+            print("Se mostro en pantalla el objeto boton para escoger materias para maestros")
+            self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
+                                                        text="Escoger materias",
+                                                        font=('Arial', 15, 'bold'),
+                                                        fg_color=pbGreen1,
+                                                        hover_color=pbGreen2,
+                                                        command= lambda: self.selectSubjects())
             self.scheduleAppointmentButton.pack(pady=(20, 10))
 
         self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
@@ -333,12 +382,12 @@ class mainApp(ctk.CTk):
         self.scheduleDescriptionTextbox = ctk.CTkTextbox(self.scheduleFrame, wrap='word')
         self.scheduleDescriptionTextbox.pack(pady=0,padx=(50,50), expand=True, fill='both')
         
-        self.returnToIndexWindowAlumnButton = ctk.CTkButton(self.scheduleFrame,
+        self.returnToindexWindowButton = ctk.CTkButton(self.scheduleFrame,
                                                             text="Volver",
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbRed1,
                                                             hover_color=pbRed2,
-                                                            command= lambda: self.returnToIndexWindowAlumn())
+                                                            command= lambda: self.returnToindexWindow())
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton = ctk.CTkButton(self.scheduleFrame,
                                                             text="Agendar cita",
@@ -349,11 +398,11 @@ class mainApp(ctk.CTk):
                                                                                          self.selectTeacherCombobox.get(), 
                                                                                          self.calendar.get_date(), 
                                                                                          self.scheduleDescriptionTextbox.get("1.0", "end")))
-        self.returnToIndexWindowAlumnButton.pack(pady=50, padx=(50,10), side='left',anchor="nw", expand=True)
+        self.returnToindexWindowButton.pack(pady=50, padx=(50,10), side='left',anchor="nw", expand=True)
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
 
-    def returnToIndexWindowAlumn(self):
+    def returnToindexWindow(self):
         print("Se volvio al index")
         self.scheduleFrame.grid_forget()
         self.calendarFrame.grid_forget()
@@ -375,10 +424,11 @@ class mainApp(ctk.CTk):
         self.viewAppointmentsLabel = ctk.CTkLabel(self.viewAppointmentsFrame,
                                                   text=f"Citas registradas de {id}",
                                                   font=("Arial",20,"bold"))
-        self.viewAppointmentsLabel.pack(pady=20)
+        self.viewAppointmentsLabel.pack(pady=(20,10))
 
         if typeuser == "Alumno": # Pantalla para los alumnos
             print("Se desplego la pantalla para alumnos")
+            areAcceptedAppointments(id)
             pendientAppointmentList = loadPendientAppointmentsForStudent(id)
             if pendientAppointmentList == []:
                 pendientAppointmentList = ["No hay asesorias registrados"]
@@ -425,7 +475,7 @@ class mainApp(ctk.CTk):
                                                                     state="readonly",
                                                                     values=pendientAppointmentList,
                                                                     width=500)
-            self.viewAppointmentsPendientCombobox.pack(pady=20)
+            self.viewAppointmentsPendientCombobox.pack(pady=(10,20))
             if pendientAppointmentListBool:
                 self.buttonslalaFrame = ctk.CTkFrame(self.viewAppointmentsFrame,
                                                      fg_color='transparent')
@@ -453,6 +503,10 @@ class mainApp(ctk.CTk):
                 self.deleteAppointmentButton.pack(side='left',pady=(0,10), anchor="n",padx=(10))
                 self.acceptAppointmentButton.pack(side='left',pady=(0,10), anchor="n",padx=(10))
                 
+                self.labelForListbox = ctk.CTkLabel(self.viewAppointmentsFrame,
+                                                    text="Asesorias aceptadas: ",
+                                                    font=("Arial",15,"bold"))
+                self.labelForListbox.pack(pady=10)
                 self.acceptedAppointments = ctk_listbox.CTkListbox(self.viewAppointmentsFrame)
                 self.acceptedAppointments.pack(fill="both", expand=True, padx=200, pady=10)
                 
@@ -595,6 +649,36 @@ def acceptAppointment(varToExtractScheduleID):
         messagebox.showinfo(title="Asesorias UABC", message=f"Ha ocurrido un error {scheduleID}")
         print("Error")
     
+
+
+
+
+
+    ###
+
+def areAcceptedAppointments(id):
+    with sqlite3.connect("database.db") as uabcDatabase:
+        cursor = uabcDatabase.cursor()
+        cursor.execute("SELECT idAlumn FROM scheduleList WHERE idAlumn = ? AND state = 'Aceptado'", (id, ))
+        aceppted = cursor.fetchone()
+        if aceppted:
+            print("El usuario tiene citas aceptadas")
+            return True
+        else:
+            print("El usuario no tiene citas aceptadas")
+            return False
+
+
+
+### NO TERMINADO
+def loadAvailableSubjects():
+    #print("Se recuperaron todas las materias disponibles")
+    with sqlite3.connect("database.db") as uabcDatabase:
+        cursor = uabcDatabase.cursor()
+        lista = cursor.execute("SELECT subjectName FROM subjects WHERE subjectId = ?", (subjectId))
+
+
+
 
 app = mainApp()
 app.mainloop()
