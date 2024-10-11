@@ -2,5 +2,8 @@
 database.sqbpro
 watafak.py
 GUIA.md
+/build
+/dist
+Asesorias.spec
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main

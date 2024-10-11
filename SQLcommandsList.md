@@ -1,5 +1,0 @@
-# Lista
-* Buscar: 
-```sql
-
-```

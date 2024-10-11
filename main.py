@@ -6,7 +6,6 @@ import tkcalendar
 from datetime import datetime
 import sqlite3
 from CTkListbox import *
-
 ctk.set_appearance_mode("dark")
 
 class mainApp(ctk.CTk):
