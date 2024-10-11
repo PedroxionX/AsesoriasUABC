@@ -1,5 +1,6 @@
 /venv
 database.sqbpro
 watafak.py
+GUIA.md
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main

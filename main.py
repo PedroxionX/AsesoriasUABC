@@ -73,6 +73,7 @@ class mainApp(ctk.CTk):
         
         self.loginFrame.grid_rowconfigure(0, weight=1)
         self.loginFrame.grid_columnconfigure(0, weight=1)
+    
     # SignUp
     def signUp(self):
         print("Se presionó el botón de registrar usuario")
@@ -184,6 +185,7 @@ class mainApp(ctk.CTk):
                                            command=self.goBack)
         self.RegisterButton.pack(side="left", padx=10, pady=5)
         self.goBackButton.pack(side="left", padx=10, pady=5)
+    
     # Función del botón para registrar
     def registerUser(self, id, password, typeuser, name, lastname, email):
         print("Se presionó el botón de registrar usuario")
@@ -207,24 +209,6 @@ class mainApp(ctk.CTk):
                 print("Ya existe un usuario con esa matrícula.")
                 messagebox.showinfo(title="Asesorias UABC", message="Ya existe un usuario con esa matrícula. Por favor ingresa otra.")
     
-    """
-    # NO TERMINADO
-    def selectSubjects(self):
-        self.indexFrame.grid_forget()
-        print("Se abrio el cuadro de seleccion de materias para el profesor")
-        self.subjectsFrame = ctk.CTkFrame(self)
-        self.subjectsFrame.grid(row=0, column=0, columnspan=2, rowspan=2, sticky="nsew")
-
-        self.label = ctk.CTkLabel(self.subjectsFrame,
-                                  text="Materias disponibles",
-                                  font=("Arial",20,"bold"))
-        self.label.pack(pady=50)
-
-        self.activateSubjectsListbox = ctk_listbox.CTkListbox(self.subjectsFrame)
-        self.activateSubjectsListbox.pack(width=300, height=300)
-        """
-
-
     # LogIn
     def logIn(self, id, password):
         print("Se presionó el botón para hacer un inicio de sesión")
@@ -243,12 +227,14 @@ class mainApp(ctk.CTk):
                 print("Usuario o contraseña incorrectos.")
                 messagebox.showinfo(title="Asesorias UABC", message="Usuario o contraseña incorrectos")
                 return False
+    
     # Función del botón para volver a la pantalla anterior (del registro al login)
     def goBack(self):
         print("Botón de volver presionado")
         self.signUpFrame.grid_forget()
         self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
         self.update_idletasks()
+    
     # Pagina principal
     def indexWindow(self, id):
         print("Ventana de indice para el alumno")
@@ -298,6 +284,7 @@ class mainApp(ctk.CTk):
     
         # Actualizar la ventana para que los cambios se reflejen
         self.update_idletasks()
+    
     # Pagina para agendar cita
     def scheduleAppointmentWindow(self, id):
         print("Se accedio a la ventana de agendar cita")
@@ -717,8 +704,6 @@ def acceptedAppointmentsForAlumns(id):
         else:
             print("El usuario no tiene citas aceptadas")
             return False
-
-
 
 app = mainApp()
 app.mainloop()
