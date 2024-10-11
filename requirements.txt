@@ -2,3 +2,4 @@ customtkinter # Mas widgets para TK https://customtkinter.tomschimansky.com/docu
 CTkMessagebox # Caja con mensaje https://github.com/Akascape/CTkMessagebox
 tkcalendar # Calendario de TKinter https://github.com/j4321/tkcalendar
 CTkListbox # Listbox de CustomTkinter https://github.com/Akascape/CTkListbox
+pyinstaller # Crear instalador
