@@ -3,7 +3,7 @@ import tkcalendar.calendar_
 from utils.colorsHex import *  # Colores utilizados dentro de la carpeta "utils"
 from tkinter import messagebox, PhotoImage
 import tkcalendar
-from datetime import datetime
+#from datetime import datetime 
 import sqlite3
 from CTkListbox import *
 ctk.set_appearance_mode("dark")
@@ -185,6 +185,15 @@ class mainApp(ctk.CTk):
         self.RegisterButton.pack(side="left", padx=10, pady=5)
         self.goBackButton.pack(side="left", padx=10, pady=5)
     
+    # LogOut
+    def logOut(self):
+        print("Se cerro sesion")
+        self.entryUser.delete(0, 'end')
+        self.entryPassword.delete(0, 'end')
+        self.indexFrame.grid_forget()
+        self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
+        self.update_idletasks()
+
     # Función del botón para registrar
     def registerUser(self, id, password, typeuser, name, lastname, email):
         print("Se presionó el botón de registrar usuario")
@@ -280,6 +289,14 @@ class mainApp(ctk.CTk):
                                                     hover_color=pbGreen2,
                                                     command=lambda: self.viewAppointments(id, typeuser))
         self.scheduleAppointmentButton.pack(pady=(20, 10))
+
+        self.logOutButton = ctk.CTkButton(self.indexFrame,
+                                          text="Cerrar sesion",
+                                          font=("Arial",12,"bold"),
+                                          command= lambda: self.logOut(),
+                                          fg_color=pbRed1,
+                                          hover_color=pbRed2)
+        self.logOutButton.pack(pady=(200,0))
     
         # Actualizar la ventana para que los cambios se reflejen
         self.update_idletasks()
@@ -540,7 +557,24 @@ class mainApp(ctk.CTk):
                                                                                     self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
                                                                                     self.update_idletasks()))
                 self.wdwGoToIndexFromAppointments.pack(pady=20)
-            
+
+    def selectSubjects(self):
+        print("Se presiono el boton para activar materias")
+        self.indexFrame.grid_forget()
+        
+        self.selectSubjectsFrame = ctk.CTkFrame(self)
+        self.selectSubjectsFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew") 
+        
+        self.selectSubjectsLabel = ctk.CTkLabel(self.selectSubjectsFrame,
+                                                text="Escoge la materia que quieras activar",
+                                                font=("Arial",20,"bold"))
+        self.selectSubjectsLabel.pack(pady=20)
+
+
+
+
+
+""" = = = Funciones extra = = = """
 # Funcion que guarda la cita
 def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
     print("Se presiono el boton de guardar cita")

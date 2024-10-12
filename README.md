@@ -10,7 +10,7 @@ Sistema de registro de citas para asesorias de materias universitarias. Aplicaci
 ## Librerias utilizadas
 * Nativas (no ocupan instalacion)
   * sqlite3
-* Externas (ocupan instalacion en tu entorno virtual)
+* Externas (ocupan instalacion en el entorno virtual)
   * customtkinter - Mas widgets para TK https://customtkinter.tomschimansky.com/documentation/
   * CTkMessagebox - Caja con mensaje https://github.com/Akascape/CTkMessagebox
   * tkcalendar - Calendario de TKinter https://github.com/j4321/tkcalendar
@@ -19,6 +19,5 @@ Sistema de registro de citas para asesorias de materias universitarias. Aplicaci
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt # Instalar todas las librerias utilizadas
 ```
-## Crear y activar entorno virtual (Windows)</h2>

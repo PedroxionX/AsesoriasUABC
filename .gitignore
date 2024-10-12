@@ -5,5 +5,8 @@ GUIA.md
 /build
 /dist
 Asesorias.spec
+setup.py
+.DS_Store
+/utils/__pycache__/colorsHex.cpython-312.pycs
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main
