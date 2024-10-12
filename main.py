@@ -6,6 +6,7 @@ import tkcalendar
 #from datetime import datetime 
 import sqlite3
 from CTkListbox import *
+
 ctk.set_appearance_mode("dark")
 
 class mainApp(ctk.CTk):
@@ -570,6 +571,14 @@ class mainApp(ctk.CTk):
                                                 font=("Arial",20,"bold"))
         self.selectSubjectsLabel.pack(pady=20)
 
+        self.unnactivatedSubjects = ctk_listbox.CTkListbox(self.selectSubjectsFrame)
+        self.unnactivatedSubjects.pack(fill="both", expand=True, padx=200, pady=10)
+        
+        with sqlite3.connect("database.db") as uabcDatabase:
+            try:
+                print("Se conecto de manera exitosa con la base de datos")
+            except:
+                print("Hubo un error al querer conectar con la base de datos")
 
 
 
