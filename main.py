@@ -2,6 +2,10 @@ import customtkinter as ctk
 import tkcalendar.calendar_
 import tkcalendar
 from CTkListbox import *
+"""from tkinter import *
+from tkinter import ttk
+from PIL import Image, ImageTk
+"""
 
 from utils.colorsHex import *
 from utils.databaseControl import *
@@ -15,8 +19,8 @@ class mainApp(ctk.CTk):
         super().__init__()
         self.geometry("1100x700")  # Tamaño de la ventana
         self.title("Asesorias UABC")
-        icon = PhotoImage(file="ico/ico.png")
-        self.iconphoto(False, icon)  # Establecer el icono de la ventana
+        #icon = ImageTk.PhotoImage(file="ico/ico.png")
+        #self.iconphoto(False, icon)  # Establecer el icono de la ventana
         
         """ = = = Inicio de widgets = = = """
         # Frame principal de login
@@ -470,8 +474,7 @@ class mainApp(ctk.CTk):
                                                                 command= lambda: (self.viewAppointmentsFrame.grid_forget(),
                                                                                     self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
                                                                                     self.update_idletasks()))
-                self.wdwGoToIndexFromAppointments.pack(pady=20)
-                    
+                self.wdwGoToIndexFromAppointments.pack(pady=20)                 
         if typeuser == "Maestro": # Pantalla para los maestros
             print("Se desplego la pantalla para maestros")
             pendientAppointmentList = loadPendientAppointmentsForTeachers(id)
@@ -514,11 +517,6 @@ class mainApp(ctk.CTk):
 
                 self.deleteAppointmentButton.pack(side='left',pady=(0,10), anchor="n",padx=(10))
                 self.acceptAppointmentButton.pack(side='left',pady=(0,10), anchor="n",padx=(10))
-                
-                self.labelForListbox = ctk.CTkLabel(self.viewAppointmentsFrame,
-                                                    text="Asesorias aceptadas: ",
-                                                    font=("Arial",15,"bold"))
-                self.labelForListbox.pack(pady=10)
                 
             if acceptedAppointmentsForTeachers(id):
                 self.labelForListbox = ctk.CTkLabel(self.viewAppointmentsFrame,
@@ -573,24 +571,28 @@ class mainApp(ctk.CTk):
         self.unnactivatedSubjects = ctk_listbox.CTkListbox(self.selectSubjectsFrame)
         self.unnactivatedSubjects.pack(fill="both", expand=True, padx=200, pady=10)
         
-        loadActivatedSubjects(id)
+        subjects = loadAllSubjects()
+        for subject in subjects:
+            self.unnactivatedSubjects.insert("end", subject)
+
+        self.activateSubjectButton = ctk.CTkButton(self.selectSubjectsFrame,
+                                                   text="Activar materia",
+                                                   font=("Arial",12,"bold"),
+                                                   fg_color=pbGreen1,
+                                                   hover_color=pbGreen2,
+                                                   command= lambda: activateSubject(id,self.unnactivatedSubjects.get()))
         
 
-#
-def loadActivatedSubjects(id):
-    with sqlite3.connect("database.db") as uabcDatabase:
-                try:
-                    cursor = uabcDatabase.cursor()
-                    cursor.execute("SELECT idSubject FROM subjectTeachers WHERE idTeacher = ?"(id,))
-                    loadQuery = cursor.fetchall()
-                    subjects = [f"Materia : {subjectName}" for subjectName in loadQuery]
-                    print("Se conecto de manera exitosa con la base de datos")
-                    print(f"Lista de materias inactivas recuperadas:")
-                    for i in subjects:
-                        print(f'{i}')
-                    return subjects
-                except:
-                    print("Hubo un error al querer conectar con la base de datos")
+        self.returnFromSubjectsFrameButton = ctk.CTkButton(self.selectSubjectsFrame,
+                                                   text="Volver",
+                                                   font=("Arial",12,"bold"),
+                                                   fg_color=pbRed1,
+                                                   hover_color=pbRed2,
+                                                   command= lambda: (self.selectSubjectsFrame.grid_forget(),
+                                                                     self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                                     self.update_idletasks()))
+        self.activateSubjectButton.pack(pady=20, side='left', padx=(400,20))
+        self.returnFromSubjectsFrameButton.pack(pady=20, side = "left", padx=(20))
 
 app = mainApp()
 app.mainloop()

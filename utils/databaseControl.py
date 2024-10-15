@@ -1,6 +1,6 @@
 import sqlite3
-from tkinter import messagebox, PhotoImage
-""" = = = Funciones extra = = = """
+from tkinter import messagebox
+""" = = = Funciones para controlar la base de datos = = = """
 # Funcion que guarda la cita
 def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
     print("Se presiono el boton de guardar cita")
@@ -163,3 +163,44 @@ def acceptedAppointmentsForAlumns(id):
         else:
             print("El usuario no tiene citas aceptadas")
             return False
+
+# Cargar la lista con todas las materias existentes
+def loadAllSubjects():
+    with sqlite3.connect("database.db") as uabcDatabase:
+        try:
+            cursor = uabcDatabase.cursor()
+            cursor.execute("SELECT subjectId, subjectName FROM subjects")
+            loadQuery = cursor.fetchall()
+            subjects = [f"#{subjectId} - Materia : {subjectName}" for subjectId, subjectName in loadQuery]
+            print("Se conecto de manera exitosa con la base de datos")
+            print(f"Lista de materias recuperadas:")
+            for i in subjects:
+                print(f'{i}')
+            return subjects
+        except:
+            print("Hubo un error al querer conectar con la base de datos")
+
+# Activar materia
+def activateSubject(id, stringToEdit):
+    print(stringToEdit)
+    # Extraer el número de la materia
+    subjectId = stringToEdit.split()[0].replace("#", "")  # "10"
+    subjectId = int(subjectId)  # Convertir explícitamente a entero
+    print(f"Se activará la materia #{subjectId} para el maestro: {id}")
+    
+    # Conectar a la base de datos
+    with sqlite3.connect("database.db") as uabcDatabase:
+        try:
+            cursor = uabcDatabase.cursor()
+            # Verificar si ya existe la materia para ese maestro
+            cursor.execute("SELECT idTeacher FROM subjectTeachers WHERE idTeacher = ? AND idSubject = ?", (id, subjectId,))
+            if cursor.fetchone():
+                print("El profesor ya tenía dada de alta esta materia")
+                messagebox.showinfo(title="Asesorias UABC", message="Ya tienes dada de alta esa materia")
+            else:
+                # Insertar si no existe
+                cursor.execute("INSERT INTO subjectTeachers (idTeacher, idSubject) VALUES (?, ?)", (id, subjectId,))
+                messagebox.showinfo(title="Asesorias UABC", message=f"Se activo con exito la materia #{subjectId}")
+                print("Se insertó de manera exitosa en la base de datos")
+        except sqlite3.Error as e:
+            print(f"Hubo un error al querer conectar con la base de datos: {e}")
