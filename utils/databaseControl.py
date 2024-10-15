@@ -199,3 +199,4 @@ def activateSubject(id, stringToEdit):
                 print("Se insertó de manera exitosa en la base de datos")
         except sqlite3.Error as e:
             print(f"Hubo un error al querer conectar con la base de datos: {e}")
+            
