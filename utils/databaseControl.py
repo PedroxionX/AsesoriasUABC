@@ -183,22 +183,17 @@ def loadAllSubjects():
 # Activar materia
 def activateSubject(id, stringToEdit):
     print(stringToEdit)
-    # Extraer el número de la materia
-    subjectId = stringToEdit.split()[0].replace("#", "")  # "10"
-    subjectId = int(subjectId)  # Convertir explícitamente a entero
+    subjectId = stringToEdit.split()[0].replace("#", "")
+    subjectId = int(subjectId)
     print(f"Se activará la materia #{subjectId} para el maestro: {id}")
-    
-    # Conectar a la base de datos
     with sqlite3.connect("database.db") as uabcDatabase:
         try:
             cursor = uabcDatabase.cursor()
-            # Verificar si ya existe la materia para ese maestro
             cursor.execute("SELECT idTeacher FROM subjectTeachers WHERE idTeacher = ? AND idSubject = ?", (id, subjectId,))
             if cursor.fetchone():
                 print("El profesor ya tenía dada de alta esta materia")
                 messagebox.showinfo(title="Asesorias UABC", message="Ya tienes dada de alta esa materia")
             else:
-                # Insertar si no existe
                 cursor.execute("INSERT INTO subjectTeachers (idTeacher, idSubject) VALUES (?, ?)", (id, subjectId,))
                 messagebox.showinfo(title="Asesorias UABC", message=f"Se activo con exito la materia #{subjectId}")
                 print("Se insertó de manera exitosa en la base de datos")

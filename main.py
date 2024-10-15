@@ -581,7 +581,6 @@ class mainApp(ctk.CTk):
                                                    fg_color=pbGreen1,
                                                    hover_color=pbGreen2,
                                                    command= lambda: activateSubject(id,self.unnactivatedSubjects.get()))
-        
 
         self.returnFromSubjectsFrameButton = ctk.CTkButton(self.selectSubjectsFrame,
                                                    text="Volver",
