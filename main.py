@@ -2,10 +2,6 @@ import customtkinter as ctk
 import tkcalendar.calendar_
 import tkcalendar
 from CTkListbox import *
-"""from tkinter import *
-from tkinter import ttk
-from PIL import Image, ImageTk
-"""
 
 from utils.colorsHex import *
 from utils.databaseControl import *
@@ -358,10 +354,14 @@ class mainApp(ctk.CTk):
                                              textvariable=self.selectedDayVar,
                                              font=("Arial", 20, "bold"))
         self.selectedDayLabel.pack(pady=(60, 30),padx=50, anchor="nw")
+        """"""
+
         self.selectTeacherCombobox = ctk.CTkComboBox(self.scheduleFrame,
                                                      state="readonly",
-                                                     values=teachersListVar)
+                                                     values=teachersListVar,
+                                                     width=500)
         self.selectTeacherCombobox.pack(pady=10,padx=50, anchor="nw")
+        """"""
         self.textBoxLabel = ctk.CTkLabel(self.scheduleFrame,
                                          text='Escribe aqui una descripcion sobre tu asesoria:',
                                          font=("Arial", 15, "bold"))
@@ -381,26 +381,13 @@ class mainApp(ctk.CTk):
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbGreen1,
                                                             hover_color=pbGreen2,
-                                                            command=lambda: saveSchedule(id, 
+                                                            command=lambda: funcionintermedia(id, 
                                                                                          self.selectTeacherCombobox.get(), 
                                                                                          self.calendar.get_date(), 
                                                                                          self.scheduleDescriptionTextbox.get("1.0", "end")))
         self.returnToindexWindowButton.pack(pady=50, padx=(50,10), side='left',anchor="nw", expand=True)
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
-
-    def returnToindexWindow(self):
-        print("Se volvio al index")
-        self.scheduleFrame.grid_forget()
-        self.calendarFrame.grid_forget()
-        self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
-        # Forzar la actualización de la interfaz
-        self.update_idletasks()
-
-    def update_selected_day(self, event=None):
-        selected_date = self.calendar.get_date()
-        self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
-        print(f"Fecha seleccionada: {selected_date}")
 
     def viewAppointments(self, id, typeuser):
         print("Se presiono el boton de ver asesorias pendientes")
@@ -592,6 +579,20 @@ class mainApp(ctk.CTk):
                                                                      self.update_idletasks()))
         self.activateSubjectButton.pack(pady=20, side='left', padx=(400,20))
         self.returnFromSubjectsFrameButton.pack(pady=20, side = "left", padx=(20))
+
+    """ EXTRA """
+    def returnToindexWindow(self):
+        print("Se volvio al index")
+        self.scheduleFrame.grid_forget()
+        self.calendarFrame.grid_forget()
+        self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
+        # Forzar la actualización de la interfaz
+        self.update_idletasks()
+    def update_selected_day(self, event=None):
+        selected_date = self.calendar.get_date()
+        self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
+        print(f"Fecha seleccionada: {selected_date}")
+
 
 app = mainApp()
 app.mainloop()

@@ -1,9 +1,11 @@
 import sqlite3
 from tkinter import messagebox
+from customtkinter import CTkToplevel, CTkComboBox, CTkButton
+from utils.colorsHex import *
+#from customtkinter import 
 """ = = = Funciones para controlar la base de datos = = = """
 # Funcion que guarda la cita
 def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
-    print("Se presiono el boton de guardar cita")
     idTeacher = idTeacher.split(" - ")[-1] # Convertir idTeacher a solo la matricula
     print(f'Matricula del profesor escogido: {idTeacher}')
     print(f'Dia escogido: {date}')
@@ -15,7 +17,7 @@ def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
             # Nota: Poner logica aqui por si ya encuentra un id igual que no registre la cita
             cursor = uabcDatabase.cursor()
             cursor.execute("INSERT INTO scheduleList (scheduleId, idAlumn, idTeacher, date, scheduleDescription, state) VALUES (?, ?, ?, ?, ?, ?)", 
-                           (scheduleId, idAlumn, idTeacher, date, scheduleDescription, state))
+                        (scheduleId, idAlumn, idTeacher, date, scheduleDescription, state))
             print("Asesoria guardada con exito")
             messagebox.showinfo(title="Asesorias UABC", message=f"Has registrado con exito la asesoria el dia {date}")
     except sqlite3.Error as e:
@@ -199,4 +201,65 @@ def activateSubject(id, stringToEdit):
                 print("Se insertó de manera exitosa en la base de datos")
         except sqlite3.Error as e:
             print(f"Hubo un error al querer conectar con la base de datos: {e}")
-            
+    
+# Validar datos de la asesoria
+def validateAppointment(idTeacher):
+    if idTeacher != '':
+        print('Se valido la asesoria')
+        return True
+    else:
+        messagebox.showinfo(title="Asesorias UABC", message=f"No has seleccionado a ningun profesor")
+        print('No se valido la asesoria ya que no se selecciono ningun profesor')
+        return False
+
+
+def teacherSubjects(idTeacher):
+    with sqlite3.connect("database.db") as uabcDatabase:
+        try:
+            cursor = uabcDatabase.cursor()
+            query = """
+            SELECT s.subjectName 
+            FROM subjectTeachers st
+            JOIN subjects s ON st.idSubject = s.subjectId
+            WHERE st.idTeacher = ?
+            """
+            cursor.execute(query, (idTeacher,))
+            subjects = cursor.fetchall()
+            if subjects:
+                print(f"Materias que imparte el profesor {idTeacher}:")
+                for subject in subjects:
+                    print(subject[0])
+                return subjects
+            else:
+                print(f"El profesor con ID {idTeacher} no imparte materias.")
+        except sqlite3.Error as e:
+            print(f"Hubo un error al querer conectar con la base de datos: {e}")
+
+
+def funcionintermedia(idAlumn, idTeacher, date, scheduleDescription):
+    if validateAppointment(idTeacher):
+        semesterList = ["Primer semestre", "Segundo semestre", "Tercer semestre", "Cuarto semestre", "Quinto semestre", "Sexto semestre", "Septimo semestre", "Octavo semestre"]
+        teacherSubjectsList = tupleToListBUGGG(teacherSubjects(int(idTeacher.split("- ")[1]))) # Esto es lo mas sucio que he hecho en mi vida
+        print(f"Lista {teacherSubjectsList}")
+        toplevel = CTkToplevel()
+        toplevel.selectSubjectCombobox = CTkComboBox(toplevel,
+                                                     values=teacherSubjectsList,
+                                                     state="readonly")
+        toplevel.selectSubjectCombobox.pack(pady=20, padx=50)
+
+        toplevel.selectSemesterCombobox = CTkComboBox(toplevel,
+                                                      values=semesterList)
+        toplevel.selectSemesterCombobox.pack(pady=20, padx=50)
+        toplevel.confirmButton = CTkButton(toplevel,
+                                           text="Confirmar",
+                                           font=("Arial",12,"bold"),
+                                           fg_color=pbGreen1,
+                                           hover_color=pbGreen2,
+                                           command=lambda: saveSchedule(idAlumn, 
+                                                                        idTeacher, 
+                                                                        date, 
+                                                                        f"{scheduleDescription} - Asesoria para la materia: {toplevel.selectSubjectCombobox.get()} - Alumno de: {toplevel.selectSemesterCombobox.get()}"))
+        toplevel.confirmButton.pack(pady=20, padx=50)
+
+def tupleToListBUGGG(lista_tuplas):
+    return [item[0] for item in lista_tuplas]

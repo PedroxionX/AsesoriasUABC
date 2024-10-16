@@ -2,11 +2,12 @@
 Sistema de registro de citas para asesorias de materias universitarias. Aplicacion hecha en Python para solicitar asesorias. El sistema cuenta con una base de datos en la que se maneja el registro de los usuarios (tanto alumnos como profesores) y el almacenamiento de las asesorias solicitadas.
 ## Requerimientos
 - [x] Calendario
-- [ ] Lista de materias que imparte
+- [x] Lista de materias que imparte
 - [x] Registro de usuarios y Log In
 - [x] Apartado para agendar cita
-- [ ] Escoger semestre
-- [ ] Agendar mediante materia y horario
+- [x] Escoger semestre
+- [x] Agendar mediante materia y horario
+- [ ] Que el maestro pueda ver la descripcion de la asesoria
 ## Librerias utilizadas
 * Nativas (no ocupan instalacion)
   * sqlite3
