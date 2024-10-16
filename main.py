@@ -389,6 +389,7 @@ class mainApp(ctk.CTk):
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
 
+    # Pagina para ver citas
     def viewAppointments(self, id, typeuser):
         print("Se presiono el boton de ver asesorias pendientes")
         self.indexFrame.grid_forget()
@@ -532,7 +533,14 @@ class mainApp(ctk.CTk):
                                                                                                             self.viewAppointmentsFrame.grid_forget(),
                                                                                                             self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
                                                                                                             self.update_idletasks()))
-                self.wdwGoToIndexFromAppointments.pack(pady=20, side='left', padx=(370,50)) 
+                self.wdwGoToIndexFromAppointments.pack(pady=20, side='left', padx=(270,50)) 
+                #
+                self.viewDescriptionAppointment = ctk.CTkButton(self.viewAppointmentsFrame,
+                                                                text="Ver descripcion",
+                                                                font=("Arial", 12, "bold"),
+                                                                command= lambda: viewDescription(extractScheduleId(self.acceptedAppointments.get())))
+                self.viewDescriptionAppointment.pack(pady=20, side='left', padx=(30,50)) 
+                #
                 self.eliminateAppointmentAlreadyAccepted.pack(pady=20, side='left', padx=(50,0))
             else: 
                 self.wdwGoToIndexFromAppointments = ctk.CTkButton(self.viewAppointmentsFrame,

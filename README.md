@@ -7,7 +7,7 @@ Sistema de registro de citas para asesorias de materias universitarias. Aplicaci
 - [x] Apartado para agendar cita
 - [x] Escoger semestre
 - [x] Agendar mediante materia y horario
-- [ ] Que el maestro pueda ver la descripcion de la asesoria
+- [x] Que el maestro pueda ver la descripcion de la asesoria
 ## Librerias utilizadas
 * Nativas (no ocupan instalacion)
   * sqlite3

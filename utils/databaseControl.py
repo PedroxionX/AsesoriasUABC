@@ -263,3 +263,16 @@ def funcionintermedia(idAlumn, idTeacher, date, scheduleDescription):
 
 def tupleToListBUGGG(lista_tuplas):
     return [item[0] for item in lista_tuplas]
+
+def viewDescription(scheduleId):
+    if scheduleId == "":
+        print("El usuario no selecciono asesoria e intento recuperar la descripcion ")
+        messagebox.showinfo(title="Asesorias UABC", message=f"Descripcion de la asesoria: {description[0]}")
+    else:
+        print(f"Se recuperará la descripción de la cita con ID: {scheduleId}")
+        with sqlite3.connect("database.db") as uabcDatabase:
+            cursor = uabcDatabase.cursor()
+            cursor.execute("SELECT scheduleDescription FROM scheduleList WHERE scheduleId = ?", (scheduleId,))
+            description = cursor.fetchone()
+            print(f"La descripcion de la cita es: {description[0]}")
+            messagebox.showinfo(title="Asesorias UABC", message=f"Descripcion de la asesoria: {description[0]}")
