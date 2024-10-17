@@ -12,5 +12,6 @@ TuAplicacion.spec
 databaseBack.db
 database.db-journal
 .DS_Store
+AsesoríasUABC.spec
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main
