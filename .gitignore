@@ -11,5 +11,6 @@ setup.py
 TuAplicacion.spec
 databaseBack.db
 database.db-journal
+.DS_Store
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main
