@@ -2,7 +2,51 @@ import sqlite3
 from tkinter import messagebox
 from customtkinter import CTkToplevel, CTkComboBox, CTkButton
 from utils.colorsHex import *
-#from customtkinter import 
+import os
+
+def connectDatabase():
+    db_name = 'database.db'
+    print("Se verificara si existe o no la base de datos")
+    if not os.path.exists(db_name):
+        print("Se creara la base de datos")
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+        # Crear tabla scheduleList
+        cursor.execute('''CREATE TABLE scheduleList (
+                            scheduleId TEXT PRIMARY KEY,
+                            idAlumn INTEGER,
+                            idTeacher INTEGER,
+                            date TEXT,
+                            scheduleDescription TEXT,
+                            state TEXT
+                          )''')
+        # Crear tabla users
+        cursor.execute('''CREATE TABLE users (
+                            id NUMERIC PRIMARY KEY,
+                            password TEXT,
+                            typeuser TEXT,
+                            name TEXT,
+                            lastname TEXT,
+                            email TEXT
+                          )''')
+        # Crear tabla subjects
+        cursor.execute('''CREATE TABLE subjects (
+                            subjectId INTEGER PRIMARY KEY,
+                            subjectName TEXT
+                          )''')
+        # Crear tabla subjectTeachers
+        cursor.execute('''CREATE TABLE subjectTeachers (
+                            idTeacher INTEGER,
+                            idSubject INTEGER
+                          )''')
+        conn.commit()
+        conn.close()
+        print(f"Base de datos '{db_name}' creada con éxito.")
+    else:
+        print(f"La base de datos '{db_name}' ya existe.")
+
+# Llamar a la función para crear la base de datos si no existe
+
 """ = = = Funciones para controlar la base de datos = = = """
 # Funcion que guarda la cita
 def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
@@ -262,7 +306,10 @@ def funcionintermedia(idAlumn, idTeacher, date, scheduleDescription):
         toplevel.confirmButton.pack(pady=20, padx=50)
 
 def tupleToListBUGGG(lista_tuplas):
-    return [item[0] for item in lista_tuplas]
+    if lista_tuplas == None:
+        messagebox.showinfo(title="Asesorias UABC", message="El profesor que escogiste aun no tiene materias dadas de alta")
+    else:
+        return [item[0] for item in lista_tuplas]
 
 def viewDescription(scheduleId):
     if scheduleId == "":

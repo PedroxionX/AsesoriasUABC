@@ -9,11 +9,14 @@ subjectsList = [
     "Big Data", "Microcontroladores", "Visión por Computadora", "Robótica", 
     "Programación Funcional", "Automatización", "DevOps", "Ciencia de Datos", 
     "Blockchain", "Compiladores", "Realidad Virtual", "Redes Neuronales"
-]
-x=1
-with sqlite3.connect("database.db") as uabcDatabase:
-    for subject in subjectsList:
-        print("")
-        cursor = uabcDatabase.cursor()
-        cursor.execute("INSERT INTO subjects (subjectId, subjectName) VALUES (?, ?)",(x,subject, ))
-        x += 1
+    ]
+def insertSubjectsInDB(subjectsList):
+    x=1
+    with sqlite3.connect("database.db") as uabcDatabase:
+        for subject in subjectsList:
+            print("")
+            cursor = uabcDatabase.cursor()
+            cursor.execute("INSERT INTO subjects (subjectId, subjectName) VALUES (?, ?)",(x,subject, ))
+            x += 1
+
+insertSubjectsInDB(subjectsList)

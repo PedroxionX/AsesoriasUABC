@@ -8,6 +8,8 @@ from utils.databaseControl import *
 
 ctk.set_appearance_mode("dark")
 
+connectDatabase()
+
 class mainApp(ctk.CTk):
     # Inicializacion
     def __init__(self):
