@@ -150,6 +150,17 @@ class mainApp(ctk.CTk):
         self.passwordLabel.pack(side="left", padx=10, pady=5)
         self.passwordEntry.pack(side="left", padx=10, pady=5)
 
+        # Password confirm
+        passwordConfirmFrame = ctk.CTkFrame(dataFrame, fg_color='transparent')
+        passwordConfirmFrame.pack(pady=10)
+        self.passwordConfirmLabel = ctk.CTkLabel(passwordConfirmFrame,
+                                           text="Rep. Contraseña:",
+                                           font=("Arial", 15, "bold"))
+        self.passwordConfirmEntry = ctk.CTkEntry(passwordConfirmFrame, show="*")
+
+        self.passwordConfirmLabel.pack(side="left", padx=10, pady=5)
+        self.passwordConfirmEntry.pack(side="left", padx=10, pady=5)
+
         # Tipo de cuenta
         usertypesList = ["Alumno", "Maestro"]  # lista de roles disponibles
         typeuserFrame = ctk.CTkFrame(dataFrame, fg_color='transparent')
@@ -171,12 +182,13 @@ class mainApp(ctk.CTk):
         self.RegisterButton = ctk.CTkButton(buttonsFrame,
                                              text="Registrar",
                                              font=("Arial", 12, "bold"),
-                                             command=lambda: self.registerUser(self.idEntry.get(), 
-                                                                                self.passwordEntry.get(), 
-                                                                                self.typeuserCombobox.get(), 
-                                                                                self.nameEntry.get(), 
-                                                                                self.lastNameEntry.get(), 
-                                                                                self.emailEntry.get()))
+                                             command=lambda: validateRegisterEntrys(self.idEntry.get(), 
+                                                                            self.passwordEntry.get(),
+                                                                            self.passwordConfirmEntry.get(), 
+                                                                            self.typeuserCombobox.get(), 
+                                                                            self.nameEntry.get(), 
+                                                                            self.lastNameEntry.get(), 
+                                                                            self.emailEntry.get()))
 
         self.goBackButton = ctk.CTkButton(buttonsFrame,
                                            text="Volver",
@@ -196,29 +208,6 @@ class mainApp(ctk.CTk):
         self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
         self.update_idletasks()
 
-    # Función del botón para registrar
-    def registerUser(self, id, password, typeuser, name, lastname, email):
-        print("Se presionó el botón de registrar usuario")
-        with sqlite3.connect("database.db") as uabcDatabase:
-            cursor = uabcDatabase.cursor()
-            cursor.execute("SELECT * FROM users WHERE id = ?", (id,))
-            existing_user = cursor.fetchone()
-            if existing_user is None:
-                print("No se encontró otro usuario con esa matrícula, se podrá agregar.")
-                
-                cursor.execute("INSERT INTO users (id, password, typeuser, name, lastname, email) VALUES (?, ?, ?, ?, ?, ?)", 
-                               (id, password, typeuser, name, lastname, email))
-
-                if cursor.rowcount > 0:
-                    print("Usuario registrado exitosamente.")
-                    messagebox.showinfo(title="Asesorias UABC", message="Usuario registrado con éxito")
-                else:
-                    print("Error al registrar usuario.")
-                    messagebox.showinfo(title="Asesorias UABC", message="Error al registrar usuario")
-            else:
-                print("Ya existe un usuario con esa matrícula.")
-                messagebox.showinfo(title="Asesorias UABC", message="Ya existe un usuario con esa matrícula. Por favor ingresa otra.")
-    
     # LogIn
     def logIn(self, id, password):
         print("Se presionó el botón para hacer un inicio de sesión")
@@ -231,7 +220,7 @@ class mainApp(ctk.CTk):
                 print("Usuario encontrado. Acceso concedido.")
                 messagebox.showinfo(title="Asesorias UABC", message=f"Bienvenido {name} {lastname}")
                 self.loginFrame.grid_forget()  # Ocultar el frame de login
-                self.indexWindow(id)  # Llamar a la función para mostrar la ventana de índice
+                self.indexWindow(id, typeuser)  # Llamar a la función para mostrar la ventana de índice
                 return True
             else:
                 print("Usuario o contraseña incorrectos.")
@@ -246,14 +235,8 @@ class mainApp(ctk.CTk):
         self.update_idletasks()
     
     # Pagina principal
-    def indexWindow(self, id):
-        print("Ventana de indice para el alumno")
-        print(id)
-        with sqlite3.connect("database.db") as uabcDatabase:
-            cursor = uabcDatabase.cursor()
-            cursor.execute("SELECT typeuser FROM users WHERE id = ?", (id,))
-            typeuser = cursor.fetchone()[0] # El [0] es para que acceda solo a la tupla e imprima unicamente la palabra del tipo de usuario
-            print(typeuser)
+    def indexWindow(self, id, typeuser):
+        print(f"Ventana de indice para el {typeuser} con matricula {id}")
         # Crear el nuevo frame de índice
         self.indexFrame = ctk.CTkFrame(self)
         self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew") 
@@ -266,7 +249,6 @@ class mainApp(ctk.CTk):
         self.scheduleAppointmentButton.pack(pady=100)
          # Botón para agendar cita dentro del indexFrame
         if typeuser == "Alumno":
-            print("Se mostro en pantalla el objeto boton para registrar asesoria para alumnos")
             self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
                                                         text="Agendar asesoria",
                                                         font=('Arial', 15, 'bold'),
@@ -275,7 +257,6 @@ class mainApp(ctk.CTk):
                                                         command= lambda: self.scheduleAppointmentWindow(id))
             self.scheduleAppointmentButton.pack(pady=(20, 10))
         if typeuser == "Maestro":
-            print("Se mostro en pantalla el objeto boton para escoger materias para maestros")
             self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
                                                         text="Activar materias",
                                                         font=('Arial', 15, 'bold'),

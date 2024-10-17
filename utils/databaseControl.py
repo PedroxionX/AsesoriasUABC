@@ -48,6 +48,29 @@ def connectDatabase():
 # Llamar a la función para crear la base de datos si no existe
 
 """ = = = Funciones para controlar la base de datos = = = """
+
+def registerUser(id, password, typeuser, name, lastname, email):
+    print("Se presionó el botón de registrar usuario")
+    with sqlite3.connect("database.db") as uabcDatabase:
+        cursor = uabcDatabase.cursor()
+        cursor.execute("SELECT * FROM users WHERE id = ?", (id,))
+        existing_user = cursor.fetchone()
+        if existing_user is None:
+            print("No se encontró otro usuario con esa matrícula, se podrá agregar.")
+                
+            cursor.execute("INSERT INTO users (id, password, typeuser, name, lastname, email) VALUES (?, ?, ?, ?, ?, ?)", 
+                            (id, password, typeuser, name, lastname, email))
+
+            if cursor.rowcount > 0:
+                print("Usuario registrado exitosamente.")
+                messagebox.showinfo(title="Asesorias UABC", message="Usuario registrado con éxito")
+            else:
+                print("Error al registrar usuario.")
+                messagebox.showinfo(title="Asesorias UABC", message="Error al registrar usuario")
+        else:
+            print("Ya existe un usuario con esa matrícula.")
+            messagebox.showinfo(title="Asesorias UABC", message="Ya existe un usuario con esa matrícula. Por favor ingresa otra.")
+    
 # Funcion que guarda la cita
 def saveSchedule(idAlumn, idTeacher, date, scheduleDescription):
     idTeacher = idTeacher.split(" - ")[-1] # Convertir idTeacher a solo la matricula
@@ -323,3 +346,29 @@ def viewDescription(scheduleId):
             description = cursor.fetchone()
             print(f"La descripcion de la cita es: {description[0]}")
             messagebox.showinfo(title="Asesorias UABC", message=f"Descripcion de la asesoria: {description[0]}")
+
+def validateRegisterEntrys(id, password, password2, typeuser, name, lastname, email):
+    if name == "":
+        print("El usuario no escribio su nombre")
+        messagebox.showinfo(title="Asesorias UABC", message="No puedes dejar vacio el campo de nombre")
+    elif lastname == "":
+        print("El usuario no escribio su apellido")
+        messagebox.showinfo(title="Asesorias UABC", message="No puedes dejar vacio el campo de apellido")
+    elif id == "":
+        print("El usuario no escribio su matricula")
+        messagebox.showinfo(title="Asesorias UABC", message="No puedes dejar vacio el campo de matricula")
+    elif email == "":
+        print("El usuario no escribio su correo electronico")
+        messagebox.showinfo(title="Asesorias UABC", message="No puedes dejar vacio el campo de correo electronico")
+    elif password == "":
+        print("El usuario no escribio su contraseña")
+        messagebox.showinfo(title="Asesorias UABC", message="No puedes dejar vacio el campo de contraseña")
+    elif password != password2:
+        print("El usuario no escribio las dos contraseñas iguales")
+        messagebox.showinfo(title="Asesorias UABC", message="Las contraseñas no coinciden")
+    elif typeuser == "":
+        print("El usuario no selecciono un tipo de usuario")
+        messagebox.showinfo(title="Asesorias UABC", message="Selecciona un tipo de usuario")
+    else:
+        id = int(id)
+        registerUser(id, password, typeuser, name, lastname, email)
