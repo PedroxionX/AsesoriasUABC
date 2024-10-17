@@ -10,5 +10,6 @@ setup.py
 /utils/__pycache__/colorsHex.cpython-312.pycs
 TuAplicacion.spec
 databaseBack.db
+database.db-journal
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main
