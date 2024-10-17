@@ -9,5 +9,6 @@ setup.py
 .DS_Store
 /utils/__pycache__/colorsHex.cpython-312.pycs
 TuAplicacion.spec
+databaseBack.db
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main
