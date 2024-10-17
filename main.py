@@ -6,6 +6,9 @@ from CTkListbox import *
 from utils.colorsHex import *
 from utils.databaseControl import *
 
+from tkinter import Tk, Label
+from PIL import Image, ImageTk
+
 ctk.set_appearance_mode("dark")
 
 connectDatabase()
@@ -17,8 +20,9 @@ class mainApp(ctk.CTk):
         super().__init__()
         self.geometry("1100x700")  # Tamaño de la ventana
         self.title("Asesorias UABC")
-        #icon = ImageTk.PhotoImage(file="ico/ico.png")
-        #self.iconphoto(False, icon)  # Establecer el icono de la ventana
+        if True:
+            icon = ImageTk.PhotoImage(file="ico/ico.png")
+            self.iconphoto(False, icon)  # Establecer el icono de la ventana
         
         """ = = = Inicio de widgets = = = """
         # Frame principal de login
@@ -364,7 +368,7 @@ class mainApp(ctk.CTk):
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbGreen1,
                                                             hover_color=pbGreen2,
-                                                            command=lambda: funcionintermedia(id, 
+                                                            command=lambda: windowForSemesterAndSubject(id, 
                                                                                          self.selectTeacherCombobox.get(), 
                                                                                          self.calendar.get_date(), 
                                                                                          self.scheduleDescriptionTextbox.get("1.0", "end")))

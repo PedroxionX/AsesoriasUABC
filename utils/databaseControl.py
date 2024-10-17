@@ -1,6 +1,6 @@
 import sqlite3
 from tkinter import messagebox
-from customtkinter import CTkToplevel, CTkComboBox, CTkButton
+from customtkinter import CTkToplevel, CTkComboBox, CTkButton, CTkLabel
 from utils.colorsHex import *
 import os
 
@@ -303,29 +303,33 @@ def teacherSubjects(idTeacher):
             print(f"Hubo un error al querer conectar con la base de datos: {e}")
 
 
-def funcionintermedia(idAlumn, idTeacher, date, scheduleDescription):
+def windowForSemesterAndSubject(idAlumn, idTeacher, date, scheduleDescription):
+    teacherSubjectsList = tupleToListBUGGG(teacherSubjects(int(idTeacher.split("- ")[1])))
+    if teacherSubjectsList == None:
+        return
     if validateAppointment(idTeacher):
         semesterList = ["Primer semestre", "Segundo semestre", "Tercer semestre", "Cuarto semestre", "Quinto semestre", "Sexto semestre", "Septimo semestre", "Octavo semestre"]
-        teacherSubjectsList = tupleToListBUGGG(teacherSubjects(int(idTeacher.split("- ")[1]))) # Esto es lo mas sucio que he hecho en mi vida
         print(f"Lista {teacherSubjectsList}")
         toplevel = CTkToplevel()
+        toplevel.superiorLabel = CTkLabel(toplevel,
+                                          text="Selecciona la materia y el semestre",
+                                          font=("Arial", 15, "bold"))
+        toplevel.superiorLabel.pack(pady=(20,0), padx=30)
         toplevel.selectSubjectCombobox = CTkComboBox(toplevel,
                                                      values=teacherSubjectsList,
                                                      state="readonly")
         toplevel.selectSubjectCombobox.pack(pady=20, padx=50)
 
         toplevel.selectSemesterCombobox = CTkComboBox(toplevel,
-                                                      values=semesterList)
+                                                      values=semesterList,
+                                                      state="readonly")
         toplevel.selectSemesterCombobox.pack(pady=20, padx=50)
         toplevel.confirmButton = CTkButton(toplevel,
                                            text="Confirmar",
                                            font=("Arial",12,"bold"),
                                            fg_color=pbGreen1,
                                            hover_color=pbGreen2,
-                                           command=lambda: saveSchedule(idAlumn, 
-                                                                        idTeacher, 
-                                                                        date, 
-                                                                        f"{scheduleDescription} - Asesoria para la materia: {toplevel.selectSubjectCombobox.get()} - Alumno de: {toplevel.selectSemesterCombobox.get()}"))
+                                           command=lambda: validateToplevel(idAlumn, idTeacher, date, scheduleDescription,toplevel.selectSubjectCombobox.get(), toplevel.selectSemesterCombobox.get()))
         toplevel.confirmButton.pack(pady=20, padx=50)
 
 def tupleToListBUGGG(lista_tuplas):
@@ -372,3 +376,14 @@ def validateRegisterEntrys(id, password, password2, typeuser, name, lastname, em
     else:
         id = int(id)
         registerUser(id, password, typeuser, name, lastname, email)
+
+def validateToplevel(idAlumn, idTeacher, date, scheduleDescription, subject, semester):
+    print()
+    if subject == "":
+        print("El usuario no selecciono ninguna materia")
+        messagebox.showinfo(title="Asesorias UABC", message="Tienes que seleccionar una materia")
+    elif semester == "":
+        print("El usuario no selecciono su semestre")
+        messagebox.showinfo(title="Asesorias UABC", message="Tienes que seleccionar tu semestre")
+    else:
+        saveSchedule(idAlumn, idTeacher, date, f"{scheduleDescription} - Asesoria para la materia: {subject} - Alumno de: {semester}")
