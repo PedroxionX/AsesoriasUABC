@@ -3,6 +3,25 @@ from tkinter import messagebox
 from customtkinter import CTkToplevel, CTkComboBox, CTkButton, CTkLabel
 from utils.colorsHex import *
 import os
+subjectsList = [
+    "Programacion", "Requerimientos", "Lenguaje C", "Python", "Paradigmas", "Algebra", "Ingles", "Redes", 
+    "Bases de Datos", "Seguridad Informática", "Sistemas Operativos", "Diseño de Software", 
+    "Estructuras de Datos", "Arquitectura de Computadoras", "Desarrollo Web", "Metodologías Ágiles", 
+    "Cálculo", "Inteligencia Artificial", "Machine Learning", "Desarrollo Móvil", 
+    "Análisis de Algoritmos", "Cloud Computing", "Criptografía", "Matemáticas Discretas", 
+    "Big Data", "Microcontroladores", "Visión por Computadora", "Robótica", 
+    "Programación Funcional", "Automatización", "DevOps", "Ciencia de Datos", 
+    "Blockchain", "Compiladores", "Realidad Virtual", "Redes Neuronales"
+    ]
+# Funcion para insertar las materias en la base de datos, (solo se ejecuta en caso de que la base de datos sea nueva)
+def insertSubjectsInDB(subjectsList):
+    x=1
+    with sqlite3.connect("database.db") as uabcDatabase:
+        for subject in subjectsList:
+            print(f"Se inserto la materia {subject} en la base de datos")
+            cursor = uabcDatabase.cursor()
+            cursor.execute("INSERT INTO subjects (subjectId, subjectName) VALUES (?, ?)",(x,subject, ))
+            x += 1
 
 def connectDatabase():
     db_name = 'database.db'
@@ -39,13 +58,17 @@ def connectDatabase():
                             idTeacher INTEGER,
                             idSubject INTEGER
                           )''')
+        cursor.execute('''CREATE TABLE subjectTeachers (
+                            idTeacher INTEGER,
+                            idSubject INTEGER
+                          )''')
         conn.commit()
         conn.close()
         print(f"Base de datos '{db_name}' creada con éxito.")
+        insertSubjectsInDB(subjectsList)
+        print("Materias agregadas con exito")
     else:
         print(f"La base de datos '{db_name}' ya existe.")
-
-# Llamar a la función para crear la base de datos si no existe
 
 """ = = = Funciones para controlar la base de datos = = = """
 

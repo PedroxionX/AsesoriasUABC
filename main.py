@@ -6,23 +6,22 @@ from CTkListbox import *
 from utils.colorsHex import *
 from utils.databaseControl import *
 
-from tkinter import Tk, Label
-from PIL import Image, ImageTk
+from PIL import ImageTk
 
 ctk.set_appearance_mode("dark")
 
-connectDatabase()
+connectDatabase() # Funcion para verificar si encuentra la base de datos, en caso de que no exista crea una vacia.
 
 class mainApp(ctk.CTk):
-    # Inicializacion
+    # Inicializacion y primera ventana
     def __init__(self):
         """ = = = Configuracion de la ventana = = = """
         super().__init__()
-        self.geometry("1100x700")  # Tamaño de la ventana
+        self.geometry("1100x700")
         self.title("Asesorias UABC")
         if True:
             icon = ImageTk.PhotoImage(file="ico/ico.png")
-            self.iconphoto(False, icon)  # Establecer el icono de la ventana
+            self.iconphoto(False, icon)
         
         """ = = = Inicio de widgets = = = """
         # Frame principal de login
@@ -78,11 +77,11 @@ class mainApp(ctk.CTk):
         
         self.loginFrame.grid_rowconfigure(0, weight=1)
         self.loginFrame.grid_columnconfigure(0, weight=1)
-    
+    ###
     # SignUp
     def signUp(self):
         print("Se presionó el botón de registrar usuario")
-        self.loginFrame.grid_forget()  # Ocultar el frame de login
+        self.loginFrame.grid_forget()
         
         # Frame principal de signUp
         self.signUpFrame = ctk.CTkFrame(self)
@@ -199,10 +198,12 @@ class mainApp(ctk.CTk):
                                            font=("Arial", 12, "bold"),
                                            fg_color=pbRed1,
                                            hover_color=pbRed2,
-                                           command=self.goBack)
+                                           command= lambda: (self.signUpFrame.grid_forget(),
+                                                             self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                             self.update_idletasks()))
         self.RegisterButton.pack(side="left", padx=10, pady=5)
         self.goBackButton.pack(side="left", padx=10, pady=5)
-    
+    ###
     # LogOut
     def logOut(self):
         print("Se cerro sesion")
@@ -211,7 +212,7 @@ class mainApp(ctk.CTk):
         self.indexFrame.grid_forget()
         self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
         self.update_idletasks()
-
+    ###
     # LogIn
     def logIn(self, id, password):
         print("Se presionó el botón para hacer un inicio de sesión")
@@ -223,21 +224,14 @@ class mainApp(ctk.CTk):
                 name, lastname, typeuser = usuario
                 print("Usuario encontrado. Acceso concedido.")
                 messagebox.showinfo(title="Asesorias UABC", message=f"Bienvenido {name} {lastname}")
-                self.loginFrame.grid_forget()  # Ocultar el frame de login
-                self.indexWindow(id, typeuser)  # Llamar a la función para mostrar la ventana de índice
+                self.loginFrame.grid_forget()
+                self.indexWindow(id, typeuser)
                 return True
             else:
                 print("Usuario o contraseña incorrectos.")
                 messagebox.showinfo(title="Asesorias UABC", message="Usuario o contraseña incorrectos")
                 return False
-    
-    # Función del botón para volver a la pantalla anterior (del registro al login)
-    def goBack(self):
-        print("Botón de volver presionado")
-        self.signUpFrame.grid_forget()
-        self.loginFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
-        self.update_idletasks()
-    
+    ###
     # Pagina principal
     def indexWindow(self, id, typeuser):
         print(f"Ventana de indice para el {typeuser} con matricula {id}")
@@ -251,7 +245,6 @@ class mainApp(ctk.CTk):
                                                         text_color='white',
                                                         fg_color='transparent')
         self.scheduleAppointmentButton.pack(pady=100)
-         # Botón para agendar cita dentro del indexFrame
         if typeuser == "Alumno":
             self.scheduleAppointmentButton = ctk.CTkButton(self.indexFrame,
                                                         text="Agendar asesoria",
@@ -284,10 +277,8 @@ class mainApp(ctk.CTk):
                                           fg_color=pbRed1,
                                           hover_color=pbRed2)
         self.logOutButton.pack(pady=(200,0))
-    
-        # Actualizar la ventana para que los cambios se reflejen
-        self.update_idletasks()
-    
+        self.update_idletasks() # Usar esto siempre para que la ventana se refresque
+    ###
     # Pagina para agendar cita
     def scheduleAppointmentWindow(self, id):
         print("Se accedio a la ventana de agendar cita")
@@ -311,10 +302,10 @@ class mainApp(ctk.CTk):
                                             year=2023, 
                                             month=10, 
                                             day=4,
-                                            font=("Arial", 14, "bold"),  # Cambiar tamaño de fuente
+                                            font=("Arial", 14, "bold"),
                                             borderwidth=2, 
-                                            relief="solid",  # Agregar borde
-                                            selectbackground=pbGreen1,  # Cambiar color de selección
+                                            relief="solid",
+                                            selectbackground=pbGreen1,
                                             selectforeground="white",
                                             showothermonthdays=False,
                                             normalforeground=pbGreen1,
@@ -341,14 +332,11 @@ class mainApp(ctk.CTk):
                                              textvariable=self.selectedDayVar,
                                              font=("Arial", 20, "bold"))
         self.selectedDayLabel.pack(pady=(60, 30),padx=50, anchor="nw")
-        """"""
-
         self.selectTeacherCombobox = ctk.CTkComboBox(self.scheduleFrame,
                                                      state="readonly",
                                                      values=teachersListVar,
                                                      width=500)
         self.selectTeacherCombobox.pack(pady=10,padx=50, anchor="nw")
-        """"""
         self.textBoxLabel = ctk.CTkLabel(self.scheduleFrame,
                                          text='Escribe aqui una descripcion sobre tu asesoria:',
                                          font=("Arial", 15, "bold"))
@@ -361,21 +349,24 @@ class mainApp(ctk.CTk):
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbRed1,
                                                             hover_color=pbRed2,
-                                                            command= lambda: self.returnToindexWindow())
+                                                            command= lambda: (self.scheduleFrame.grid_forget(),
+                                                                              self.calendarFrame.grid_forget(),
+                                                                              self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
+                                                                              self.update_idletasks()))
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton = ctk.CTkButton(self.scheduleFrame,
                                                             text="Agendar cita",
                                                             font=('Arial',12,"bold"),
                                                             fg_color=pbGreen1,
                                                             hover_color=pbGreen2,
-                                                            command=lambda: windowForSemesterAndSubject(id, 
-                                                                                         self.selectTeacherCombobox.get(), 
-                                                                                         self.calendar.get_date(), 
-                                                                                         self.scheduleDescriptionTextbox.get("1.0", "end")))
+                                                            command=lambda: windowForSemesterAndSubject(id,
+                                                                                                        self.selectTeacherCombobox.get(),
+                                                                                                        self.calendar.get_date(),
+                                                                                                        self.scheduleDescriptionTextbox.get("1.0", "end")))
         self.returnToindexWindowButton.pack(pady=50, padx=(50,10), side='left',anchor="nw", expand=True)
         if teachersListVar != ["No hay profesores registrados"]:
             self.saveScheduleAlumnButton.pack(pady=50,padx=(50), side='right', expand=True, anchor='e')
-
+    ###
     # Pagina para ver citas
     def viewAppointments(self, id, typeuser):
         print("Se presiono el boton de ver asesorias pendientes")
@@ -388,7 +379,7 @@ class mainApp(ctk.CTk):
                                                   font=("Arial",20,"bold"))
         self.viewAppointmentsLabel.pack(pady=(20,10))
 
-        if typeuser == "Alumno": # Pantalla para los alumnos
+        if typeuser == "Alumno":
             print("Se desplego la pantalla para alumnos")
             showAccepteedListBool = acceptedAppointmentsForAlumns(id)
             pendientAppointmentList = loadPendientAppointmentsForStudent(id)
@@ -450,7 +441,7 @@ class mainApp(ctk.CTk):
                                                                                     self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
                                                                                     self.update_idletasks()))
                 self.wdwGoToIndexFromAppointments.pack(pady=20)                 
-        if typeuser == "Maestro": # Pantalla para los maestros
+        if typeuser == "Maestro":
             print("Se desplego la pantalla para maestros")
             pendientAppointmentList = loadPendientAppointmentsForTeachers(id)
             acceptedAppointmentList = loadAcceptedAppointmentsForTeachers(id)
@@ -537,7 +528,8 @@ class mainApp(ctk.CTk):
                                                                                     self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew"),
                                                                                     self.update_idletasks()))
                 self.wdwGoToIndexFromAppointments.pack(pady=20)
-
+    ###
+    # Pagina para dar de alta una materia
     def selectSubjects(self, id):
         print("Se presiono el boton para activar materias")
         self.indexFrame.grid_forget()
@@ -574,15 +566,7 @@ class mainApp(ctk.CTk):
                                                                      self.update_idletasks()))
         self.activateSubjectButton.pack(pady=20, side='left', padx=(400,20))
         self.returnFromSubjectsFrameButton.pack(pady=20, side = "left", padx=(20))
-
-    """ EXTRA """
-    def returnToindexWindow(self):
-        print("Se volvio al index")
-        self.scheduleFrame.grid_forget()
-        self.calendarFrame.grid_forget()
-        self.indexFrame.grid(row=0, column=0, columnspan=2, rowspan=2, pady=50, sticky="nsew")
-        # Forzar la actualización de la interfaz
-        self.update_idletasks()
+    # Funcion que actualiza el dia seleccionado
     def update_selected_day(self, event=None):
         selected_date = self.calendar.get_date()
         self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
