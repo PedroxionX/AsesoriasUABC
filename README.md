@@ -28,10 +28,10 @@ pip install -r requirements.txt # Instalar todas las librerias utilizadas
 > Primero necesitas haber instalado las librerias en tu entorno Python.
   1. Instalar pyinstaller
 ```bash
-pip install pyinstaller # Instalar todas las librerias utilizadas
+pip install pyinstaller
 ```
   2. Ejecutar build.py
 ```bash
-python3 build.py # Instalar todas las librerias utilizadas
+python3 build.py
 ```
   3. Dirigirnos a la carpeta 'dist' donde encontraremos el binario ejecutable
