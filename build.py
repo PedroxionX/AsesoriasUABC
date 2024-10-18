@@ -15,7 +15,6 @@ options = [
     main_file,
     '--name=AsesoríasUABC',
     '--onefile',
-    '--windowed',
     f'--add-data={utils_dir}:utils',
     f'--add-data={ico_dir}:ico',
     '--icon=' + os.path.join(ico_dir, 'ico.png'),

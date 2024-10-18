@@ -23,3 +23,5 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt # Instalar todas las librerias utilizadas
 ```
+## Crear binario ejecutable (Unix)
+[!NOTE]
