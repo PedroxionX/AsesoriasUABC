@@ -1,3 +1,5 @@
+import sys
+import os
 import customtkinter as ctk
 import tkcalendar.calendar_
 import tkcalendar
@@ -10,6 +12,16 @@ from PIL import ImageTk
 
 ctk.set_appearance_mode("dark")
 
+def resource_path(relative_path):
+    #Get absolute path to resource, works for dev and for PyInstaller 
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
 connectDatabase() # Funcion para verificar si encuentra la base de datos, en caso de que no exista crea una vacia.
 
 class mainApp(ctk.CTk):
@@ -19,8 +31,10 @@ class mainApp(ctk.CTk):
         super().__init__()
         self.geometry("1100x700")
         self.title("Asesorias UABC")
+
         if True:
-            icon = ImageTk.PhotoImage(file="ico/ico.png")
+            icon_path = resource_path(os.path.join("ico", "ico.png"))
+            icon = ImageTk.PhotoImage(file=icon_path)
             self.iconphoto(False, icon)
         
         """ = = = Inicio de widgets = = = """

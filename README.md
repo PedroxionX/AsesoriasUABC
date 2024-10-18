@@ -23,3 +23,15 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt # Instalar todas las librerias utilizadas
 ```
+## Crear binario ejecutable (Unix)
+>[!NOTE]
+> Primero necesitas haber instalado las librerias en tu entorno Python.
+  1. Instalar pyinstaller
+```bash
+pip install pyinstaller
+```
+  2. Ejecutar build.py
+```bash
+python3 build.py
+```
+  3. Dirigirnos a la carpeta 'dist' donde encontraremos el binario ejecutable

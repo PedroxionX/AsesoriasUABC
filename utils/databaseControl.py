@@ -58,10 +58,6 @@ def connectDatabase():
                             idTeacher INTEGER,
                             idSubject INTEGER
                           )''')
-        cursor.execute('''CREATE TABLE subjectTeachers (
-                            idTeacher INTEGER,
-                            idSubject INTEGER
-                          )''')
         conn.commit()
         conn.close()
         print(f"Base de datos '{db_name}' creada con éxito.")
