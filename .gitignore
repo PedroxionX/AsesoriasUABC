@@ -15,5 +15,6 @@ database.db-journal
 AsesoríasUABC.spec
 prueba.py
 database.db
+/utils/__pycache__
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main

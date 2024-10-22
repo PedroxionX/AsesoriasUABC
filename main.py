@@ -587,5 +587,6 @@ class mainApp(ctk.CTk):
         print(f"Fecha seleccionada: {selected_date}")
 
 
+
 app = mainApp()
 app.mainloop()
