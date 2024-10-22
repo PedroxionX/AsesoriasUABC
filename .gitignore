@@ -13,5 +13,7 @@ databaseBack.db
 database.db-journal
 .DS_Store
 AsesoríasUABC.spec
+prueba.py
+database.db
 # Comando para forzar el pull 
 # git fetch --all && git reset --hard origin/main
