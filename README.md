@@ -17,7 +17,7 @@ Sistema de registro de citas para asesorias de materias universitarias. Aplicaci
   * customtkinter - Mas widgets para TK https://customtkinter.tomschimansky.com/documentation/
   * CTkMessagebox - Caja con mensaje https://github.com/Akascape/CTkMessagebox
   * tkcalendar - Calendario de TKinter https://github.com/j4321/tkcalendar
-  * CTkListbox # Listbox de CustomTkinter https://github.com/Akascape/CTkListbox
+  * CTkListbox - Listbox de CustomTkinter https://github.com/Akascape/CTkListbox
 ## Crear y activar entorno virtual (Unix)
 ```bash
 python3 -m venv venv
