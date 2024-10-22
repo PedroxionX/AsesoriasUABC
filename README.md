@@ -12,6 +12,7 @@ Sistema de registro de citas para asesorias de materias universitarias. Aplicaci
 * Nativas (no ocupan instalacion)
   * sqlite3
   * os
+  * webbrowser
 * Externas (ocupan instalacion en el entorno virtual)
   * customtkinter - Mas widgets para TK https://customtkinter.tomschimansky.com/documentation/
   * CTkMessagebox - Caja con mensaje https://github.com/Akascape/CTkMessagebox

@@ -4,11 +4,14 @@ import customtkinter as ctk
 import tkcalendar.calendar_
 import tkcalendar
 from CTkListbox import *
+import webbrowser
 
 from utils.colorsHex import *
 from utils.databaseControl import *
 
 from PIL import ImageTk
+
+chatbotURL = 'https://balderramap.blob.core.windows.net/deploy/index.html'
 
 ctk.set_appearance_mode("dark")
 
@@ -81,6 +84,15 @@ class mainApp(ctk.CTk):
                                              fg_color=pbRed1,
                                              hover_color=pbRed2,
                                              command=self.signUp)
+        self.buttonRegister.pack(pady=10)
+
+        self.labelPassword = ctk.CTkLabel(self.loginFrame, text="Si ocupas ayuda:",
+                                           font=('Arial', 15, 'bold'))
+        self.labelPassword.pack(pady=10)
+
+        self.buttonRegister = ctk.CTkButton(self.loginFrame,text="Chatbot",
+                                             font=('Arial', 12, 'bold'),
+                                             command= lambda: openWeb(chatbotURL))
         self.buttonRegister.pack(pady=10)
 
         # Configuración de las filas y columnas
@@ -586,7 +598,8 @@ class mainApp(ctk.CTk):
         self.selectedDayVar.set(f"Día seleccionado: {selected_date}")
         print(f"Fecha seleccionada: {selected_date}")
 
-
+def openWeb(url):
+    webbrowser.open(url)
 
 app = mainApp()
 app.mainloop()
