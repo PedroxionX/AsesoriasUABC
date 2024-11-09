@@ -323,7 +323,7 @@ def teacherSubjects(idTeacher):
 
 
 def windowForSemesterAndSubject(idAlumn, idTeacher, date, scheduleDescription):
-    teacherSubjectsList = tupleToListBUGGG(teacherSubjects(int(idTeacher.split("- ")[1])))
+    teacherSubjectsList = tupleToListBUGGG(teacherSubjects(int(idTeacher.split("- ")[1]))) # lo peor que he hecho nunca
     if teacherSubjectsList == None:
         return
     if validateAppointment(idTeacher):
